@@ -21,6 +21,6 @@ Click on the arrow to the right to continue to the first step.
 
 ## See Also
 
-- [Prerequisites in the AWS CDK User Guide](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_prerequisites)
+- [Prerequisites in the Terraform CDK User Guide](https://developer.hashicorp.com/terraform/tutorials/cdktf/cdktf-build#prerequisites)
 
 {{< nextprevlinks >}}

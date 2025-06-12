@@ -12,4 +12,3 @@ workshop/.hugo_build.lock
 obj/
 cdk.out/
 *~
-**/.vscode/**

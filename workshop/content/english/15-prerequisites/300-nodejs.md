@@ -4,8 +4,8 @@ chapter = false
 weight = 300
 +++
 
-The AWS CDK uses Node.js (>= 10.13.0, except for versions 13.0.0 - 13.6.0).
-A version in active long-term support (16.x at this writing) is recommended.
+The Terraform CDK uses Node.js (>= 18).
+A version in active long-term support (20.x at this writing) is recommended.
 
 * To install Node.js visit the [node.js](https://nodejs.org) website.
 
@@ -18,10 +18,10 @@ A version in active long-term support (16.x at this writing) is recommended.
     node --version
     ```
 
-    Output should be >= 10.13.0:
+    Output should be >= 18:
 
     ```
-    v10.3.0
+    v20.19.3
     ```
 
 {{< nextprevlinks >}}

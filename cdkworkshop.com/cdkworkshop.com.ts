@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+
+// NOTE: Before redirect
+// https://github.com/aws-samples/aws-cdk-intro-workshop/pull/1478/files?diff=unified&w=1#diff-037ad33a0965a87240f9aeb7d2efa871f2012bce547a01b5b3c703b3dc16c0f9
+
+// to be converted, similar to learn.terraconstructs.dev
+// https://github.com/TerraConstructs/learn/blob/main/infra/main.ts
+
 import {
   aws_certificatemanager as acm,
   aws_cloudfront as cloudfront,

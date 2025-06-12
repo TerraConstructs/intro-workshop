@@ -20,7 +20,7 @@
         "typescript": "^5.5.3"
     },
     "repository": {
-        "url": "https://github.com/aws-samples/aws-cdk-intro-workshop.git",
+        "url": "https://github.com/terraconstructs/intro-workshop.git",
         "type": "git"
     },
     "dependencies": {
@@ -28,6 +28,6 @@
         "constructs": "^10.3.0"
     },
     "engines": {
-        "node": ">= 10.0.0"
+        "node": ">= 20.0.0"
     }
 }

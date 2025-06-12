@@ -1,5 +1,5 @@
 +++
-title = "cdk init"
+title = "CDKTF init"
 weight = 100
 +++
 
@@ -11,12 +11,12 @@ Create an empty directory on your system:
 mkdir cdk-workshop && cd cdk-workshop
 ```
 
-## cdk init
+## CDKTF init
 
-We will use `cdk init` to create a new TypeScript CDK project:
+We will use `cdktf init` to create a new TypeScript-CDKTF project:
 
 ```
-cdk init sample-app --language typescript
+cdktf init sample-app --language typescript
 ```
 
 Output should look like this (you can safely ignore warnings about
@@ -31,27 +31,27 @@ npm notice created a lockfile as package-lock.json. You should commit this file.
 npm WARN tst@0.1.0 No repository field.
 npm WARN tst@0.1.0 No license field.
 
-# Welcome to your CDK TypeScript project!
+# Welcome to your CDKTF TypeScript project!
 
-You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`CdkWorkshopStack`)
+You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`CdktfWorkshopStack`)
 which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+The `cdktf.json` file tells the CDK Toolkit how to execute your app.
 
 ## Useful commands
 
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+ * `npm run build`     compile typescript to js
+ * `npm run watch`     watch for changes and compile
+ * `npm run test`      perform the jest unit tests
+ * `cdktf deploy`      deploy this stack to your default region
+ * `cdktf diff`        compare deployed stack with current state
+ * `cdktf synth`       emits the synthesized CloudFormation template
 ```
 
 As you can see, it shows us a bunch of useful commands to get us started.
 
 ## See Also
 
-- [AWS CDK Command Line Toolkit (cdk) in the AWS CDK User Guide](https://docs.aws.amazon.com/CDK/latest/userguide/tools.html)
+- [CDKTF Command Line Toolkit (cdktf) in the Terraform CDK User Guide](https://developer.hashicorp.com/terraform/tutorials/cdktf/cdktf-install)
 
 {{< nextprevlinks >}}
