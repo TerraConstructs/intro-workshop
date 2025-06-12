@@ -15,15 +15,15 @@ You'll see something like this:
 
 ![](./structure.png)
 
-* __`lib/cdk-workshop-stack.ts`__ is where your CDK application's main stack is defined.
+* __`lib/cdktf-workshop-stack.ts`__ is where your CDKTF application's main stack is defined.
   This is the file we'll be spending most of our time in.
-* `bin/cdk-workshop.ts` is the entrypoint of the CDK application. It will load
-  the stack defined in `lib/cdk-workshop-stack.ts`.
+* `bin/cdktf-workshop.ts` is the entrypoint of the CDKTF application. It will load
+  the stack defined in `lib/cdktf-workshop-stack.ts`.
 * `package.json` is your npm module manifest. It includes information like the
   name of your app, version, dependencies and build scripts like "watch" and
   "build" (`package-lock.json` is maintained by npm)
-* `cdk.json` tells the toolkit how to run your app. In our case it will be
-  `"npx ts-node bin/cdk-workshop.ts"`
+* `cdktf.json` tells the toolkit how to run your app. In our case it will be
+  `"npx ts-node bin/cdktf-workshop.ts"`
 * `tsconfig.json` your project's [typescript
   configuration](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
 * `.gitignore` and `.npmignore` tell git and npm which files to include/exclude
@@ -33,30 +33,30 @@ You'll see something like this:
 
 ## Your app's entry point
 
-Let's have a quick look at `bin/cdk-workshop.ts`:
+Let's have a quick look at `bin/cdktf-workshop.ts`:
 
 ```js
 #!/usr/bin/env node
-import * as cdk from 'aws-cdk-lib';
-import { CdkWorkshopStack } from '../lib/cdk-workshop-stack';
+import * as cdk from 'aws-cdktf-lib';
+import { CdktfWorkshopStack } from '../lib/cdktf-workshop-stack';
 
 const app = new cdk.App();
-new CdkWorkshopStack(app, 'CdkWorkshopStack');
+new CdktfWorkshopStack(app, 'CdktfWorkshopStack');
 ```
 
-This code loads and instantiates the `CdkWorkshopStack` class from the
-`lib/cdk-workshop-stack.ts` file. We won't need to look at this file anymore.
+This code loads and instantiates the `CdktfWorkshopStack` class from the
+`lib/cdktf-workshop-stack.ts` file. We won't need to look at this file anymore.
 
 ## The main stack
 
-Open up `lib/cdk-workshop-stack.ts`. This is where the meat of our application
+Open up `lib/cdktf-workshop-stack.ts`. This is where the meat of our application
 is:
 
 ```ts
-import * as cdk from 'aws-cdk-lib';
-import * as sns from 'aws-cdk-lib/aws-sns';
-import * as subs from 'aws-cdk-lib/aws-sns-subscriptions';
-import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as cdk from 'cdktf';
+import * as sns from 'terraconstructs/notify';
+import * as subs from 'terraconstructs/notify/subscriptions';
+import * as sqs from 'terraconstructs/notify';
 
 export class CdkWorkshopStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {

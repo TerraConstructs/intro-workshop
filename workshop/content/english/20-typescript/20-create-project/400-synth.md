@@ -1,26 +1,27 @@
 +++
-title = "cdk synth"
+title = "CDKTF synth"
 weight = 400
 +++
 
 ## Synthesize a template from your app
 
 AWS CDK apps are effectively only a __definition__ of your infrastructure using
-code. When CDK apps are executed, they produce (or "__synthesize__", in CDK
+code. When CDKTF apps are executed, they produce (or "__synthesize__", in CDKTF
 parlance) an AWS CloudFormation template for each stack defined in your
 application.
 
-To synthesize a CDK app, use the `cdk synth` command. Let's check out the
+To synthesize a CDK app, use the `cdktf synth` command. Let's check out the
 template synthesized from the sample app:
 
-{{% notice info %}} The **CDK CLI** requires you to be in the same directory 
-as your `cdk.json` file. If you have changed directories in your terminal, 
+{{% notice info %}} The **CDKTF CLI** requires you to be in the same directory 
+as your `cdktf.json` file. If you have changed directories in your terminal, 
 please navigate back now.{{% /notice %}}
 
 ```
-cdk synth
+cdktf synth
 ```
 
+<!-- TODO: Replace with generated cdk.tf.json -->
 Will output the following CloudFormation template:
 
 ```yaml

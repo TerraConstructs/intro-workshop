@@ -1,7 +1,7 @@
-baseURL = "https://cdkworkshop.com"
+baseURL = "https://aws-workshop.terraconstructs.dev"
 languageCode = "en-us"
 defaultContentLanguage = "en"
-title = "AWS CDK Workshop"
+title = "TerraConstructs AWS Workshop"
 theme = "hugo-book"
 uglyurls = true
 sectionPagesMenu = "main"
@@ -54,7 +54,7 @@ title = true
 
   # Set source repository location.
   # Used for 'Last Modified' and 'Edit this page' links.
-  BookRepo = 'https://github.com/aws-samples/aws-cdk-intro-workshop'
+  BookRepo = 'https://github.com/terraconstructs/intro-workshop'
 
   # (Optional, default 'commit') Specifies commit portion of the link to the page's last modified
   # commit hash for 'doc' page type.
@@ -104,23 +104,23 @@ title = true
 
 [[menu.after]]
 name = "CDK on GitHub"
-url = "https://github.com/awslabs/aws-cdk"
+url = "https://github.com/terraconstructs/base"
 weight = 2
 
 [[menu.after]]
 name = "CDK on StackOverflow"
-url = "https://stackoverflow.com/questions/tagged/aws-cdk"
+url = "https://stackoverflow.com/questions/tagged/terraconstructs"
 weight = 3
 
 [[menu.after]]
-name = "CDK on Gitter"
+name = "CDK on Discord"
 identifier = "gt"
-url = "https://gitter.im/awslabs/aws-cdk"
+url = "https://discord.gg/w2NNph9q9W"
 weight = 4
 
 [[menu.after]]
 name = "Submit a correction"
-url = "https://github.com/aws-samples/aws-cdk-intro-workshop"
+url = "https://github.com/terraconstructs/intro-workshop"
 weight = 1
 
 

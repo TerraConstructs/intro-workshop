@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "aws-cdk-lib": "2.80.0",
-    "cdkworkshop-lib": "^1.0.1",
+    "cdkworkshop-lib": "workspace:*",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }

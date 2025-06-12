@@ -5,11 +5,11 @@ weight = 200
 
 ## Lambda handler code
 
-We'll start with the AWS Lambda handler code.
+We'll start with the Terraconstructs Lambda handler code.
 
 1. Create a directory `lambda` in the root of your project tree (next to `bin`
    and `lib`).
-2. TS CDK projects created with `cdk init` ignore all `.js` files by default. 
+2. TS CDK projects created with `cdktf init` ignore all `.js` files by default. 
    To track these files with git, add `!lambda/*.js` to your `.gitignore` file. 
    This ensures that your Lambda assets are discoverable during the Pipelines 
    section of this tutorial.
@@ -22,12 +22,12 @@ exports.handler = async function(event) {
   return {
     statusCode: 200,
     headers: { "Content-Type": "text/plain" },
-    body: `Hello, CDK! You've hit ${event.path}\n`
+    body: `Hello, CDKTF! You've hit ${event.path}\n`
   };
 };
 ```
-
-This is a simple Lambda function which returns the text __"Hello, CDK! You've
+<!-- TODO: Edit text wit corresponding libs and Terraconstruct nodes... (IDK)-->
+This is a simple Lambda function which returns the text __"Hello, CDKTF! You've
 hit [url path]"__. The function's output also includes the HTTP status code and
 HTTP headers. These are used by API Gateway to formulate the HTTP response to
 the user.
@@ -60,23 +60,24 @@ help you with auto-complete, inline documentation and type safety.
 
 ## Add an AWS Lambda Function to your stack
 
-Add an `import` statement at the beginning of `lib/cdk-workshop-stack.ts`, and a
-`lambda.Function` to your stack.
+Add `import` statements at the beginning of `lib/cdk-workshop-stack.ts`, and a
+`compute.NodejsFunction` to your stack.
 
 
-{{<highlight ts "hl_lines=2 8-13">}}
-import * as cdk from 'aws-cdk-lib';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
+{{<highlight ts "hl_lines=2-3 5-6 10-14">}}
+import type { App } from 'cdktf';
+import * as aws from 'terraconstructs/lib/aws';
+import * as compute from 'terraconstructs/lib/aws/compute';
 
-export class CdkWorkshopStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+export class CdktfWorkshopStack extends aws.AwsStack {
+  constructor(scope: App, id: string, props?: aws.AwsStackProps) {
     super(scope, id, props);
 
     // defines an AWS Lambda resource
-    const hello = new lambda.Function(this, 'HelloHandler', {
-      runtime: lambda.Runtime.NODEJS_16_X,    // execution environment
-      code: lambda.Code.fromAsset('lambda'),  // code loaded from "lambda" directory
-      handler: 'hello.handler'                // file is "hello", function is "handler"
+    const hello = new compute.NodejsFunction(this, 'HelloHandler', {
+      runtime: "nodejs18.x",
+      code: compute.Code.fromAsset('lambda'),
+      handler: 'hello.handler',
     });
   }
 }
@@ -86,14 +87,14 @@ A few things to notice:
 
 - Our function uses the NodeJS (`NODEJS_16_X`) runtime
 - The handler code is loaded from the `lambda` directory which we created
-  earlier. Path is relative to where you execute `cdk` from, which is the
+  earlier. Path is relative to where you execute `cdktf` from, which is the
   project's root directory
 - The name of the handler function is `hello.handler` ("hello" is the name of
   the file and "handler" is the exported function name)
 
 ## A word about constructs and constructors
 
-As you can see, the class constructors of both `CdkWorkshopStack` and
+As you can see, the class constructors of both `CdktfWorkshopStack` and
 `lambda.Function` (and many other classes in the CDK) have the signature
 `(scope, id, props)`. This is because all of these classes are __constructs__.
 Constructs are the basic building block of CDK apps. They represent abstract
@@ -112,10 +113,10 @@ signature:
    `this` for the first argument. Make a habit out of it.
 2. __`id`__: the second argument is the __local identity__ of the construct.
    It's an ID that has to be unique amongst construct within the same scope. The
-   CDK uses this identity to calculate the CloudFormation [Logical
+   CDKTF uses this identity to calculate the CloudFormation [Logical
    ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html)
    for each resource defined within this scope. *To read more about IDs in the
-   CDK, see the* [CDK user manual](https://docs.aws.amazon.com/cdk/latest/guide/identifiers.html#identifiers_logical_ids).
+   CDK, see the* [CDKTF user manual](https://docs.aws.amazon.com/cdk/latest/guide/identifiers.html#identifiers_logical_ids).
 3. __`props`__: the last (sometimes optional) argument is always a set of
    initialization properties. Those are specific to each construct. For example,
    the `lambda.Function` construct accepts properties like `runtime`, `code` and
@@ -128,13 +129,13 @@ signature:
 Save your code, and let's take a quick look at the diff before we deploy:
 
 ```
-cdk diff
+cdktf diff
 ```
 
 Output would look like this:
 
 ```text
-Stack CdkWorkshopStack
+Stack CdktfWorkshopStack
 IAM Statement Changes
 ┌───┬─────────────────────────────────┬────────┬────────────────┬──────────────────────────────┬───────────┐
 │   │ Resource                        │ Effect │ Action         │ Principal                    │ Condition │

@@ -1,4 +1,5 @@
 const { awscdk } = require('projen');
+const { NodePackageManager } = require('projen/lib/javascript');
 const { ReleaseTrigger } = require('projen/lib/release');
 
 const project = new awscdk.AwsCdkConstructLibrary({
@@ -26,6 +27,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   },
   majorVersion: 1,
   releaseTrigger: ReleaseTrigger.manual(),
+  packageManager: NodePackageManager.PNPM,
 
   // deps: [],                /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */

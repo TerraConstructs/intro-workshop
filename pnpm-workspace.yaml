@@ -1,0 +1,9 @@
+packages:
+  - 'cdkworkshop.com'
+  - 'code/typescript/main-workshop'
+  - 'code/typescript/internal-constructs-workshop/construct-lib-repo/constructs'
+  - 'code/typescript/internal-constructs-workshop/construct-lib-repo/pipelines'
+  - 'code/typescript/internal-constructs-workshop/hello-cdk-app'
+  - 'code/typescript/internal-constructs-workshop/internal-construct-hub'
+  - 'code/typescript/pipelines-workshop'
+  - 'code/typescript/tests-workshop'

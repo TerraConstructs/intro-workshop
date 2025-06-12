@@ -1,5 +1,5 @@
 +++
-title = "CDK Watch"
+title = "CDKTF Watch"
 weight = 300
 +++
 
@@ -12,20 +12,20 @@ can speed up your personal deployments.
 
 It's great that we have a working lambda! But what if we want to tweak the lambda
 code to get it just right? Let's say that we have now decided that we want our
-lambda function to respond with `"Good Morning, CDK!"` instead of `"Hello, CDK"`.
+lambda function to respond with `"Good Morning, CDKTF!"` instead of `"Hello, CDKTF"`.
 
 So far, it seems like the only tool we have at our disposal to update our stack is
-`cdk deploy`. But `cdk deploy` takes time; it has to deploy your CloudFormation
+`cdktf deploy`. But `cdktf deploy` takes time; it has to deploy your CloudFormation
 stack and upload the `lambda` directory from your disk to the bootstrap bucket. If
 we're just changing our lambda code, we don't actually need to update the
-CloudFormation stack, so that part of `cdk deploy` is wasted effort.
+CloudFormation stack, so that part of `cdktf deploy` is wasted effort.
 
 We really only need to update our lambda code. It would be great if we had
 some other mechanism for doing only that...
 
-## Timing `cdk deploy`
+## Timing `cdktf deploy`
 
-First, let's time how long it takes to run `cdk deploy`. It will help us baseline how
+First, let's time how long it takes to run `cdktf deploy`. It will help us baseline how
 long a full CloudFormation deployment takes. To do this, we are going to change the code 
 inside `lambda/hello.js`:
 
@@ -43,7 +43,7 @@ exports.handler = async function(event) {
 Then, we can run `cdk deploy`:
 
 ```
-cdk deploy
+cdktf deploy
 ```
 
 The output will look something like this:
@@ -51,12 +51,12 @@ The output will look something like this:
 ```
 ✨  Synthesis time: 6s
 
-CdkWorkshopStack: deploying...
-CdkWorkshopStack: creating CloudFormation changeset...
+CdktfWorkshopStack: deploying...
+CdktfWorkshopStack: creating CloudFormation changeset...
 
 
 
- ✅  CdkWorkshopStack
+ ✅  CdktfWorkshopStack
 
 ✨  Deployment time: 66.82s
 
@@ -76,16 +76,16 @@ stacks in order to speed up deployments. For this reason, only use it for
 development purposes. Never use hotswap for your production deployments!
 {{% /notice %}}
 
-We can speed up that deployment time with `cdk deploy --hotswap`, which will
+We can speed up that deployment time with `cdktf deploy --hotswap`, which will
 assess whether a hotswap deployment can be performed instead of a CloudFormation
-deployment. If possible, the CDK CLI will use AWS service APIs to directly make
+deployment. If possible, the CDKTF CLI will use AWS service APIs to directly make
 the changes; otherwise it will fall back to performing a full CloudFormation
 deployment.
 
-Here, we will use `cdk deploy --hotswap` to deploy a hotswappable change to your 
+Here, we will use `cdktf deploy --hotswap` to deploy a hotswappable change to your 
 AWS Lambda asset code.
 
-## Timing `cdk deploy --hotswap`
+## Timing `cdktf deploy --hotswap`
 
 Let's change the lambda code in `lambda/hello.js` another time:
 
@@ -95,15 +95,15 @@ exports.handler = async function(event) {
   return {
     statusCode: 200,
     headers: { "Content-Type": "text/plain" },
-    body: `Good Afternoon, CDK! You've hit ${event.path}\n`
+    body: `Good Afternoon, CDKTF! You've hit ${event.path}\n`
   };
 };
 {{</highlight>}}
 
-Now, let's run `cdk deploy --hotswap`:
+Now, let's run `cdktf deploy --hotswap`:
 
 ```
-cdk deploy --hotswap
+cdktf deploy --hotswap
 ```
 
 The output will look something like this:
@@ -119,7 +119,7 @@ CdkWorkshopStack: deploying...
    ✨ Lambda Function 'CdkWorkshopStack-HelloHandler2E4FBA4D-tEZTcXqG8YYe'
 ✨ Lambda Function 'CdkWorkshopStack-HelloHandler2E4FBA4D-tEZTcXqG8YYe' hotswapped!
 
- ✅  CdkWorkshopStack
+ ✅  CdktfWorkshopStack
 
 ✨  Deployment time: 3.07s
 
@@ -158,26 +158,26 @@ double check!
 
 ## CDK Watch
 
-We can do better than calling `cdk deploy` or `cdk deploy --hotswap` each time.
-`cdk watch` is similar to `cdk deploy` except that instead of being a one-shot
+We can do better than calling `cdktf deploy` or `cdktf deploy --hotswap` each time.
+`cdktf watch` is similar to `cdktf deploy` except that instead of being a one-shot
 operation, it monitors your code and assets for changes and attempts to perform a 
-deployment automatically when a change is detected. By default, `cdk watch` will 
+deployment automatically when a change is detected. By default, `cdktf watch` will 
 use the `--hotswap` flag, which inspects the changes and determines if those 
-changes can be hotswapped. Calling `cdk watch --no-hotswap` will disable the 
+changes can be hotswapped. Calling `cdktf watch --no-hotswap` will disable the 
 hotswap behavior.
 
-Once we set it up, we can use `cdk watch` to detect both hotswappable changes and
+Once we set it up, we can use `cdktf watch` to detect both hotswappable changes and
 changes that require full CloudFormation deployment.
 
-## Modify your `cdk.json` file
+## Modify your `cdktf.json` file
 
-When the `cdk watch` command runs, the files that it observes are determined by the
-`"watch"` setting in the `cdk.json` file. It has two sub-keys, `"include"` and
+When the `cdktf watch` command runs, the files that it observes are determined by the
+`"watch"` setting in the `cdktf.json` file. It has two sub-keys, `"include"` and
 `"exclude"`, each of which can be either a single string or an array of strings.
-Each entry is interpreted as a path relative to the location of the `cdk.json`
+Each entry is interpreted as a path relative to the location of the `cdktf.json`
 file. Globs, both `*` and `**`, are allowed to be used.
 
-Your `cdk.json` file should look similar to this:
+Your `cdktf.json` file should look similar to this:
 
 ```json
 {
@@ -234,16 +234,16 @@ fact want to observe our `.js` files in the `lambda` folder, so let's remove
 
 Now you're all set to start watching!
 
-## Timing `cdk watch`
+## Timing `cdktf watch`
 
-First, call `cdk watch`: 
+First, call `cdktf watch`: 
 
 ```
 cdk watch
 ```
 
 This will trigger an initial deployment and immediately begin observing the files
-we've specified in `cdk.json`.
+we've specified in `cdktf.json`.
 
 Let's change our lambda asset code in `lambda/hello.js` one more time:
 
@@ -253,12 +253,12 @@ exports.handler = async function(event) {
   return {
     statusCode: 200,
     headers: { "Content-Type": "text/plain" },
-    body: `Good Night, CDK! You've hit ${event.path}\n`
+    body: `Good Night, CDKTF! You've hit ${event.path}\n`
   };
 };
 {{</highlight>}}
 
-Once you save the changes to your Lambda code file, `cdk watch` will recognize that
+Once you save the changes to your Lambda code file, `cdktf watch` will recognize that
 your file has changed and trigger a new deployment. In this case, it will recognize
 that we can hotswap the lambda asset code, so it will bypass a CloudFormation
 deployment and deploy directly to the Lambda service instead.
@@ -278,7 +278,7 @@ CdkWorkshopStack: deploying...
    ✨ Lambda Function 'CdkWorkshopStack-HelloHandler2E4FBA4D-tEZTcXqG8YYe'
 ✨ Lambda Function 'CdkWorkshopStack-HelloHandler2E4FBA4D-tEZTcXqG8YYe' hotswapped!
 
- ✅  CdkWorkshopStack
+ ✅  CdktfWorkshopStack
 
 ✨  Deployment time: 2.54s
 
@@ -290,11 +290,11 @@ arn:aws:cloudformation:REGION:ACCOUNT-ID:stack/CdkWorkshopStack/STACK-ID
 
 ## Wrap Up
 
-The rest of this tutorial will continue using `cdk deploy` instead of `cdk watch`.
-But if you want to, you can simply keep `cdk watch` on. If you need to make a full
-deployment, `cdk watch` will call `cdk deploy` for you.
+The rest of this tutorial will continue using `cdktf deploy` instead of `cdktf watch`.
+But if you want to, you can simply keep `cdktf watch` on. If you need to make a full
+deployment, `cdktf watch` will call `cdktf deploy` for you.
 
-For a deeper dive on `cdk watch` use cases, read
-[Increasing Development Speed with CDK Watch](https://aws.amazon.com/blogs/developer/increasing-development-speed-with-cdk-watch/).
+For a deeper dive on `cdktf watch` use cases, read
+[Increasing Development Speed with CDKTF Watch](https://aws.amazon.com/blogs/developer/increasing-development-speed-with-cdk-watch/).
 
 {{< nextprevlinks >}}
