@@ -17,7 +17,7 @@
         "@biomejs/biome": "1.8.3",
         "@types/node": "^20.14.11",
         "aws-cdk": "^2.149.0",
-        "typescript": "^5.5.3"
+        "typescript": "^5.8.3"
     },
     "repository": {
         "url": "https://github.com/terraconstructs/intro-workshop.git",
