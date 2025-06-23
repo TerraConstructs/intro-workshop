@@ -16,7 +16,7 @@
     "devDependencies": {
         "@biomejs/biome": "1.8.3",
         "@types/node": "^20.14.11",
-        "aws-cdk": "^2.149.0",
+        "aws-cdk": "^2.1019.1",
         "typescript": "^5.5.3"
     },
     "repository": {
