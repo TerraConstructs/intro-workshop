@@ -9,10 +9,9 @@ We'll start with the Terraconstructs Lambda handler code.
 
 1. Create a directory `lambda` in the root of your project tree (next to `bin`
    and `lib`).
-2. TS CDK projects created with `cdktf init` ignore all `.js` files by default. 
-   To track these files with git, add `!lambda/*.js` to your `.gitignore` file. 
-   This ensures that your Lambda assets are discoverable during the Pipelines 
-   section of this tutorial.
+2. TS CDKTF projects created with `cdktf init` ignore all `.js` files by default.
+   To track these files with git, add `!lambda/*.js` to your `.gitignore` file.
+   This ensures that your Lambda assets are properly checked into source control.
 3. Add a file called `lambda/hello.js` with the following contents:
 
 ---
@@ -26,7 +25,7 @@ exports.handler = async function(event) {
   };
 };
 ```
-<!-- TODO: Edit text wit corresponding libs and Terraconstruct nodes... (IDK)-->
+
 This is a simple Lambda function which returns the text __"Hello, CDKTF! You've
 hit [url path]"__. The function's output also includes the HTTP status code and
 HTTP headers. These are used by API Gateway to formulate the HTTP response to
@@ -39,15 +38,16 @@ Lambda documentation [here](https://docs.aws.amazon.com/lambda/latest/dg/welcome
 
 ## Install the AWS Lambda construct library
 
-The AWS CDK is shipped with an extensive library of constructs called the __AWS
-Construct Library__. The construct library is divided into __modules__, one for
-each AWS service. For example, if you want to define an AWS Lambda function, we
-will need to use the AWS Lambda construct library.
+The TerraConstructs library is an extensive library of constructs. The construct library
+is divided into __modules__, one for each Cloud and Service type it supports. For example,
+if you want to define an AWS Lambda function, we will need to use the AWS Compute construct library.
 
-To discover and learn about AWS constructs, you can browse the [AWS Construct
-Library reference](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-construct-library.html).
+<!--
+TODO: publish API Reference ..
+To discover and learn about AWS constructs, you can browse the [AWS Construct Library reference](https://docs.terraconstructs.dev/aws).
 
 ![](/images/apiref.png)
+-->
 
 ## A few words about copying & pasting in this workshop
 
@@ -60,32 +60,42 @@ help you with auto-complete, inline documentation and type safety.
 
 ## Add an AWS Lambda Function to your stack
 
-Add `import` statements at the beginning of `lib/cdk-workshop-stack.ts`, and a
-`compute.NodejsFunction` to your stack.
+Add `import` statements at the beginning of `main.ts`, and a `LambdaFunction` to your stack.
 
+{{<highlight ts "hl_lines=4 10-16">}}
+import { App } from "cdktf";
+import { Construct } from "constructs";
+import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
+import { Code, LambdaFunction, Runtime } from "terraconstructs/lib/aws/compute";
 
-{{<highlight ts "hl_lines=2-3 5-6 10-14">}}
-import type { App } from 'cdktf';
-import * as aws from 'terraconstructs/lib/aws';
-import * as compute from 'terraconstructs/lib/aws/compute';
-
-export class CdktfWorkshopStack extends aws.AwsStack {
-  constructor(scope: App, id: string, props?: aws.AwsStackProps) {
+class MyStack extends AwsStack {
+  constructor(scope: Construct, id: string, props: AwsStackProps) {
     super(scope, id, props);
 
     // defines an AWS Lambda resource
-    const hello = new compute.NodejsFunction(this, 'HelloHandler', {
-      runtime: "nodejs18.x",
-      code: compute.Code.fromAsset('lambda'),
-      handler: 'hello.handler',
+    new LambdaFunction(this, "HelloHandler", {
+      // functionNamePrefix: "your-prefix-hello-handler",
+      runtime: Runtime.NODEJS_22_X,
+      code: Code.fromAsset("lambda"),
+      handler: "hello.handler",
     });
   }
 }
+
+const app = new App();
+new MyStack(app, "cdk-workshop", {
+  environmentName: "dev",
+  gridUUID: "cdk-workshop-dev",
+  providerConfig: {
+    region: "us-east-1",
+  },
+});
+app.synth();
 {{</highlight>}}
 
 A few things to notice:
 
-- Our function uses the NodeJS (`NODEJS_16_X`) runtime
+- Our function uses the NodeJS (`NODEJS_22_X`) runtime
 - The handler code is loaded from the `lambda` directory which we created
   earlier. Path is relative to where you execute `cdktf` from, which is the
   project's root directory
@@ -94,8 +104,8 @@ A few things to notice:
 
 ## A word about constructs and constructors
 
-As you can see, the class constructors of both `CdktfWorkshopStack` and
-`lambda.Function` (and many other classes in the CDK) have the signature
+As you can see, the class constructors of both `MyStack` and
+`LambdaFunction` (and many other classes in the CDK) have the signature
 `(scope, id, props)`. This is because all of these classes are __constructs__.
 Constructs are the basic building block of CDK apps. They represent abstract
 "cloud components" which can be composed together into higher level abstractions
@@ -113,16 +123,16 @@ signature:
    `this` for the first argument. Make a habit out of it.
 2. __`id`__: the second argument is the __local identity__ of the construct.
    It's an ID that has to be unique amongst construct within the same scope. The
-   CDKTF uses this identity to calculate the CloudFormation [Logical
-   ID](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html)
+   CDKTF uses this identity to calculate the Terraform [Logical
+   ID](https://developer.hashicorp.com/terraform/language/resources/syntax#resource-syntax)
    for each resource defined within this scope. *To read more about IDs in the
-   CDK, see the* [CDKTF user manual](https://docs.aws.amazon.com/cdk/latest/guide/identifiers.html#identifiers_logical_ids).
+   CDK, see the* [CDKTF user manual](https://developer.hashicorp.com/terraform/cdktf/concepts/constructs#scope).
 3. __`props`__: the last (sometimes optional) argument is always a set of
    initialization properties. Those are specific to each construct. For example,
-   the `lambda.Function` construct accepts properties like `runtime`, `code` and
+   the `LambdaFunction` construct accepts properties like `runtime`, `code` and
    `handler`. You can explore the various options using your IDE's auto-complete
-   or in the [online
-   documentation](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-lambda-readme.html).
+   <!-- or in the [online
+   documentation](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-lambda-readme.html). -->
 
 ## Diff
 
@@ -135,47 +145,76 @@ cdktf diff
 Output would look like this:
 
 ```text
-Stack CdktfWorkshopStack
-IAM Statement Changes
-┌───┬─────────────────────────────────┬────────┬────────────────┬──────────────────────────────┬───────────┐
-│   │ Resource                        │ Effect │ Action         │ Principal                    │ Condition │
-├───┼─────────────────────────────────┼────────┼────────────────┼──────────────────────────────┼───────────┤
-│ + │ ${HelloHandler/ServiceRole.Arn} │ Allow  │ sts:AssumeRole │ Service:lambda.amazonaws.com │           │
-└───┴─────────────────────────────────┴────────┴────────────────┴──────────────────────────────┴───────────┘
-IAM Policy Changes
-┌───┬─────────────────────────────┬────────────────────────────────────────────────────────────────────────────────┐
-│   │ Resource                    │ Managed Policy ARN                                                             │
-├───┼─────────────────────────────┼────────────────────────────────────────────────────────────────────────────────┤
-│ + │ ${HelloHandler/ServiceRole} │ arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole │
-└───┴─────────────────────────────┴────────────────────────────────────────────────────────────────────────────────┘
-(NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299)
+cdk-workshop  Terraform used the selected providers to generate the following execution plan.
+              Resource actions are indicated with the following symbols:
+                + create
 
-Parameters
-[+] Parameter AssetParameters/3342065582ab8a3599385f447c9f5d5b141c726eb5dc468594ec8450a97f3cb7/S3Bucket AssetParameters3342065582ab8a3599385f447c9f5d5b141c726eb5dc468594ec8450a97f3cb7S3BucketEB5CA0D6: {"Type":"String","Description":"S3 bucket for asset \"3342065582ab8a3599385f447c9f5d5b141c726eb5dc468594ec8450a97f3cb7\""}
-[+] Parameter AssetParameters/3342065582ab8a3599385f447c9f5d5b141c726eb5dc468594ec8450a97f3cb7/S3VersionKey AssetParameters3342065582ab8a3599385f447c9f5d5b141c726eb5dc468594ec8450a97f3cb7S3VersionKeyC5F120D1: {"Type":"String","Description":"S3 key for asset version \"3342065582ab8a3599385f447c9f5d5b141c726eb5dc468594ec8450a97f3cb7\""}
-[+] Parameter AssetParameters/3342065582ab8a3599385f447c9f5d5b141c726eb5dc468594ec8450a97f3cb7/ArtifactHash AssetParameters3342065582ab8a3599385f447c9f5d5b141c726eb5dc468594ec8450a97f3cb7ArtifactHashBAACCCD2: {"Type":"String","Description":"Artifact hash for asset \"3342065582ab8a3599385f447c9f5d5b141c726eb5dc468594ec8450a97f3cb7\""}
+              Terraform will perform the following actions:
+cdk-workshop    # aws_cloudwatch_log_group.HelloHandler_LogGroup_49850324 (HelloHandler/LogGroup) will be created
+                + resource "aws_cloudwatch_log_group" "HelloHandler_LogGroup_49850324" {
+                    + arn               = (known after apply)
+                    + id                = (known after apply)
+                    + log_group_class   = (known after apply)
+                    + name              = "/aws/lambda/cdk-workshop-dev-cdorkshopHelloHandler"
+                    + name_prefix       = (known after apply)
+                    + retention_in_days = 7
+                    + skip_destroy      = false
+                    + tags              = {
+                        + "Name"                 = "dev-HelloHandler"
+                        + "grid:EnvironmentName" = "dev"
+                        + "grid:UUID"            = "cdk-workshop-dev"
+                      }
+                    + tags_all          = {
+                        + "Name"                 = "dev-HelloHandler"
+                        + "grid:EnvironmentName" = "dev"
+                        + "grid:UUID"            = "cdk-workshop-dev"
+                      }
+                  }
 
-Resources
-[+] AWS::IAM::Role HelloHandler/ServiceRole HelloHandlerServiceRole11EF7C63
-[+] AWS::Lambda::Function HelloHandler HelloHandler2E4FBA4D
+                ...
+
+                # aws_s3_object.FileAsset_S3 (FileAsset_S3) will be created
+                + resource "aws_s3_object" "FileAsset_S3" {
+                    + acl                    = (known after apply)
+                    + arn                    = (known after apply)
+                    + bucket                 = "cdk-workshop-dev-694710432912-us-east-1"
+                    + bucket_key_enabled     = (known after apply)
+                    + checksum_crc32         = (known after apply)
+                    + checksum_crc32c        = (known after apply)
+                    + checksum_crc64nvme     = (known after apply)
+                    + checksum_sha1          = (known after apply)
+                    + checksum_sha256        = (known after apply)
+                    + content_type           = (known after apply)
+                    + etag                   = (known after apply)
+                    + force_destroy          = false
+                    + id                     = (known after apply)
+                    + key                    = "de63b575ee4558f96da9ebc022e06ff896758c0b7ddaab0ed4ab0e17318c9daa.zip"
+                    + kms_key_id             = (known after apply)
+                    + server_side_encryption = (known after apply)
+                    + source                 = "assets/FileAsset/de63b575ee4558f96da9ebc022e06ff896758c0b7ddaab0ed4ab0e17318c9daa/archive.zip"
+                    + source_hash            = "de63b575ee4558f96da9ebc022e06ff896758c0b7ddaab0ed4ab0e17318c9daa"
+                    + storage_class          = (known after apply)
+                    + tags_all               = (known after apply)
+                    + version_id             = (known after apply)
+                  }
+
+              Plan: 6 to add, 0 to change, 0 to destroy.
 ```
 
-As you can see, this code synthesizes an __AWS::Lambda::Function__ resource. It
-also synthesized a couple of [CloudFormation
-parameters](https://docs.aws.amazon.com/cdk/latest/guide/get_cfn_param.html)
-that are used by the toolkit to propagate the location of the handler code.
+As you can see, this code synthesizes an __aws_lambda_function__ resource. It
+also synthesized a couple of AWS S3 Asset objects that are used by TerraConstructs
+to propagate the location of the handler code.
 
 ## Deploy
 
 Let's deploy:
 
 ```
-cdk deploy
+cdktf deploy
 ```
 
-You'll notice that `cdk deploy` not only deployed your CloudFormation stack, but
-also archived and uploaded the `lambda` directory from your disk to the
-bootstrap bucket.
+You'll notice that `cdktf deploy` not only deployed your Terraform configuration, but
+also archived and uploaded the `lambda` directory from your disk to the asset bucket.
 
 ## Testing our function
 
@@ -191,21 +230,19 @@ Let's go to the AWS Lambda Console and test our function.
 
 2. Click on the function name to go to the console.
 
-3. Click on the __Test__ button to open the __Configure test event__ dialog:
+3. Click on the __Test__ tab tab under the __Function overview__:
 
     ![](./lambda-2.png)
 
-4. Select __Amazon API Gateway AWS Proxy__ from the __Event template__ list.
-
-5. Enter `test` under __Event name__.
+4. Enter `test` under __Event name__.
 
     ![](./lambda-3.png)
 
-6. Hit __Create__.
+5. Select __API Gateway AWS Proxy__ from the __Template__ list.
 
-7. Click __Test__ again and wait for the execution to complete.
+6. Hit __Test__ and wait for the execution to complete.
 
-8. Expand __Details__ in the __Execution result__ pane and you should see our expected output:
+7. Expand __Details__ in the __Execution result__ pane and you should see our expected output:
 
     ![](./lambda-4.png)
 

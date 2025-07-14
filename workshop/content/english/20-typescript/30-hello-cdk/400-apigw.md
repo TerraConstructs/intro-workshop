@@ -15,119 +15,124 @@ will be returned back to the user.
 
 ## Add a LambdaRestApi construct to your stack
 
-Going back to `lib/cdktf-workshop-stack.ts`, let's define an API endpoint and associate it with our Lambda function:
+Going back to `main.ts`, let's define an API endpoint and associate it with our Lambda function:
 
-{{<highlight ts "hl_lines=16-18">}}
-import type { App } from 'cdktf';
-import * as compute from 'terraconstructs/lib/aws/compute';
+{{<highlight ts "hl_lines=8 16 23-27">}}
+import { App } from "cdktf";
+import { Construct } from "constructs";
+import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
+import {
+  Code,
+  LambdaFunction,
+  Runtime,
+  LambdaRestApi,
+} from "terraconstructs/lib/aws/compute";
 
-export class CdktfWorkshopStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+class MyStack extends AwsStack {
+  constructor(scope: Construct, id: string, props: AwsStackProps) {
     super(scope, id, props);
 
     // defines an AWS Lambda resource
-    const hello = new lambda.NodejsFunction(this, 'HelloHandler', {
-      runtime: "nodejs18.x,
-      code: compute.Code.fromAsset('lambda'),
-      handler: 'hello.handler'
+    const hello = new LambdaFunction(this, "HelloHandler", {
+      // functionNamePrefix: "your-hello-handler",
+      runtime: Runtime.NODEJS_22_X,
+      code: Code.fromAsset("lambda"),
+      handler: "hello.handler",
     });
 
     // defines an API Gateway REST API resource backed by our "hello" function.
-    new compute.LambdaRestApi(this, 'Endpoint', {
-      handler: helloWithCounter.handler
+    new LambdaRestApi(this, "Endpoint", {
+      handler: hello,
+      registerOutputs: true,
     });
   }
 }
+
+const app = new App();
+new MyStack(app, "cdk-workshop", {
+  environmentName: "dev",
+  gridUUID: "cdk-workshop-dev",
+  providerConfig: {
+    region: "us-east-1",
+  },
+});
+app.synth();
 {{</highlight>}}
 
 That's it. This is all you need to do in order to define an API Gateway which
 proxies all requests to an AWS Lambda function.
 
-## cdk diff
+## cdktf diff
 
 Let's see what's going to happen when we deploy this:
 
 ```
-cdk diff
+cdktf diff
 ```
 
 Output should look like this:
 
 ```text
-Stack CdkWorkshopStack
-IAM Statement Changes
-┌───┬───────────────────────────┬────────┬───────────────────────────┬───────────────────────────┬─────────────────────────────┐
-│   │ Resource                  │ Effect │ Action                    │ Principal                 │ Condition                   │
-├───┼───────────────────────────┼────────┼───────────────────────────┼───────────────────────────┼─────────────────────────────┤
-│ + │ ${Endpoint/CloudWatchRole │ Allow  │ sts:AssumeRole            │ Service:apigateway.${AWS: │                             │
-│   │ .Arn}                     │        │                           │ :URLSuffix}               │                             │
-├───┼───────────────────────────┼────────┼───────────────────────────┼───────────────────────────┼─────────────────────────────┤
-│ + │ ${HelloHandler.Arn}       │ Allow  │ lambda:InvokeFunction     │ Service:apigateway.amazon │ "ArnLike": {                │
-│   │                           │        │                           │ aws.com                   │   "AWS:SourceArn": "arn:${A │
-│   │                           │        │                           │                           │ WS::Partition}:execute-api: │
-│   │                           │        │                           │                           │ ${AWS::Region}:${AWS::Accou │
-│   │                           │        │                           │                           │ ntId}:${EndpointEEF1FD8F}/$ │
-│   │                           │        │                           │                           │ {Endpoint/DeploymentStage.p │
-│   │                           │        │                           │                           │ rod}/*/"                    │
-│   │                           │        │                           │                           │ }                           │
-│ + │ ${HelloHandler.Arn}       │ Allow  │ lambda:InvokeFunction     │ Service:apigateway.amazon │ "ArnLike": {                │
-│   │                           │        │                           │ aws.com                   │   "AWS:SourceArn": "arn:${A │
-│   │                           │        │                           │                           │ WS::Partition}:execute-api: │
-│   │                           │        │                           │                           │ ${AWS::Region}:${AWS::Accou │
-│   │                           │        │                           │                           │ ntId}:${EndpointEEF1FD8F}/t │
-│   │                           │        │                           │                           │ est-invoke-stage/*/"        │
-│   │                           │        │                           │                           │ }                           │
-│ + │ ${HelloHandler.Arn}       │ Allow  │ lambda:InvokeFunction     │ Service:apigateway.amazon │ "ArnLike": {                │
-│   │                           │        │                           │ aws.com                   │   "AWS:SourceArn": "arn:${A │
-│   │                           │        │                           │                           │ WS::Partition}:execute-api: │
-│   │                           │        │                           │                           │ ${AWS::Region}:${AWS::Accou │
-│   │                           │        │                           │                           │ ntId}:${EndpointEEF1FD8F}/$ │
-│   │                           │        │                           │                           │ {Endpoint/DeploymentStage.p │
-│   │                           │        │                           │                           │ rod}/*/{proxy+}"            │
-│   │                           │        │                           │                           │ }                           │
-│ + │ ${HelloHandler.Arn}       │ Allow  │ lambda:InvokeFunction     │ Service:apigateway.amazon │ "ArnLike": {                │
-│   │                           │        │                           │ aws.com                   │   "AWS:SourceArn": "arn:${A │
-│   │                           │        │                           │                           │ WS::Partition}:execute-api: │
-│   │                           │        │                           │                           │ ${AWS::Region}:${AWS::Accou │
-│   │                           │        │                           │                           │ ntId}:${EndpointEEF1FD8F}/t │
-│   │                           │        │                           │                           │ est-invoke-stage/*/{proxy+} │
-│   │                           │        │                           │                           │ "                           │
-│   │                           │        │                           │                           │ }                           │
-└───┴───────────────────────────┴────────┴───────────────────────────┴───────────────────────────┴─────────────────────────────┘
-IAM Policy Changes
-┌───┬────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────┐
-│   │ Resource                   │ Managed Policy ARN                                                                      │
-├───┼────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────┤
-│ + │ ${Endpoint/CloudWatchRole} │ arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs │
-└───┴────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────┘
-(NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299)
+cdk-workshop  Terraform used the selected providers to generate the following execution
+              plan. Resource actions are indicated with the following symbols:
+                + create
 
-Resources
-[+] AWS::ApiGateway::RestApi Endpoint EndpointEEF1FD8F
-[+] AWS::ApiGateway::Deployment Endpoint/Deployment EndpointDeployment318525DA37c0e38727e25b4317827bf43e918fbf
-[+] AWS::ApiGateway::Stage Endpoint/DeploymentStage.prod EndpointDeploymentStageprodB78BEEA0
-[+] AWS::IAM::Role Endpoint/CloudWatchRole EndpointCloudWatchRoleC3C64E0F
-[+] AWS::ApiGateway::Account Endpoint/Account EndpointAccountB8304247
-[+] AWS::ApiGateway::Resource Endpoint/Default/{proxy+} Endpointproxy39E2174E
-[+] AWS::Lambda::Permission Endpoint/Default/{proxy+}/ANY/ApiPermission.CdkWorkshopStackEndpoint018E8349.ANY..{proxy+} EndpointproxyANYApiPermissionCdkWorkshopStackEndpoint018E8349ANYproxy747DCA52
-[+] AWS::Lambda::Permission Endpoint/Default/{proxy+}/ANY/ApiPermission.Test.CdkWorkshopStackEndpoint018E8349.ANY..{proxy+} EndpointproxyANYApiPermissionTestCdkWorkshopStackEndpoint018E8349ANYproxy41939001
-[+] AWS::ApiGateway::Method Endpoint/Default/{proxy+}/ANY EndpointproxyANYC09721C5
-[+] AWS::Lambda::Permission Endpoint/Default/ANY/ApiPermission.CdkWorkshopStackEndpoint018E8349.ANY.. EndpointANYApiPermissionCdkWorkshopStackEndpoint018E8349ANYE84BEB04
-[+] AWS::Lambda::Permission Endpoint/Default/ANY/ApiPermission.Test.CdkWorkshopStackEndpoint018E8349.ANY.. EndpointANYApiPermissionTestCdkWorkshopStackEndpoint018E8349ANYB6CC1B64
-[+] AWS::ApiGateway::Method Endpoint/Default/ANY EndpointANY485C938B
+              Terraform will perform the following actions:
+cdk-workshop    # aws_api_gateway_account.Endpoint_Account_B8304247 (Endpoint/Account) will be created
+                + resource "aws_api_gateway_account" "Endpoint_Account_B8304247" {
+                    + api_key_version     = (known after apply)
+                    + cloudwatch_role_arn = (known after apply)
+                    + features            = (known after apply)
+                    + id                  = (known after apply)
+                    + throttle_settings   = (known after apply)
+                  }
 
-Outputs
-[+] Output Endpoint/Endpoint Endpoint8024A810: {"Value":{"Fn::Join":["",["https://",{"Ref":"EndpointEEF1FD8F"},".execute-api.",{"Ref":"AWS::Region"},".",{"Ref":"AWS::URLSuffix"},"/",{"Ref":"EndpointDeploymentStageprodB78BEEA0"},"/"]]}}
+                # aws_api_gateway_deployment.Endpoint_Deployment_318525DA (Endpoint/Deployment/Resource) will be created
+                + resource "aws_api_gateway_deployment" "Endpoint_Deployment_318525DA" {
+                    + created_date  = (known after apply)
+                    + description   = "Automatically created by the RestApi construct"
+                    + execution_arn = (known after apply)
+                    + id            = (known after apply)
+                    + invoke_url    = (known after apply)
+                    + rest_api_id   = (known after apply)
+                    + triggers      = {
+                        + "redeployment" = "b66fffea26abdfc0e4889807f7ea0efd"
+                      }
+                  }
+
+                ...
+
+                # aws_lambda_permission.Endpoint_proxy_ANY_ApiPermissioncdk-workshopEndpoint424A4D39ANYproxy_628CE711 (Endpoint/Default/{proxy+}/ANY/ApiPermission.cdk-workshopEndpoint424A4D39.ANY..{proxy+}) will be created
+                + resource "aws_lambda_permission" "Endpoint_proxy_ANY_ApiPermissioncdk-workshopEndpoint424A4D39ANYproxy_628CE711" {
+                    + action              = "lambda:InvokeFunction"
+                    + function_name       = "arn:aws:lambda:us-east-1:694710432912:function:cdk-workshop-dev-cdorkshopHelloHandler"
+                    + id                  = (known after apply)
+                    + principal           = "apigateway.amazonaws.com"
+                    + source_arn          = (known after apply)
+                    + statement_id        = (known after apply)
+                    + statement_id_prefix = (known after apply)
+                  }
+
+              Plan: 14 to add, 0 to change, 0 to destroy.cdk-workshop
+
+cdk-workshop  Changes to Outputs:
+                + EndpointOutputs = {
+                    + restApiId             = "1wtlltjta4"
+                    + restApiName           = "cdkworkshopEndpoint424A4D39"
+                    + restApiRootResourceId = "2yujx46z9g"
+                    + url                   = "https://1wtlltjta4.execute-api.us-east-1.amazonaws.com/prod/"
+                  }
+
 ```
 
-That's nice. This one line of code added 12 new resources to our stack.
+That's nice. This one line of code added 14 new resources to our stack.
 
-## cdk deploy
+## cdktf deploy
 
 Okay, ready to deploy?
 
 ```
-cdk deploy
+cdktf deploy --skip-synth
 ```
 
 ## Stack outputs
@@ -135,11 +140,17 @@ cdk deploy
 When deployment is complete, you'll notice this line:
 
 ```
-CdkWorkshopStack.Endpoint8024A810 = https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/prod/
+cdk-workshop
+  EndpointOutputs = {
+    "restApiId": "1wtlltjta4",
+    "restApiName": "cdkworkshopEndpoint424A4D39",
+    "restApiRootResourceId": "2yujx46z9g",
+    "url": "https://1wtlltjta4.execute-api.us-east-1.amazonaws.com/prod/"
+  }
 ```
 
-This is a [stack output](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacks.html) that's
-automatically added by the API Gateway construct and includes the URL of the API Gateway endpoint.
+This is a [Terraform output](https://developer.hashicorp.com/terraform/language/values/outputs) that's
+added by the API Gateway construct when `registerOutputs` is enabled and includes the URL of the API Gateway endpoint.
 
 ## Testing your app
 

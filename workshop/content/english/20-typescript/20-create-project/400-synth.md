@@ -3,156 +3,205 @@ title = "CDKTF synth"
 weight = 400
 +++
 
-## Synthesize a template from your app
+## Synthesize configuration from your app
 
-AWS CDK apps are effectively only a __definition__ of your infrastructure using
+CDKTF apps are effectively only a __definition__ of your infrastructure using
 code. When CDKTF apps are executed, they produce (or "__synthesize__", in CDKTF
-parlance) an AWS CloudFormation template for each stack defined in your
+parlance) a Terraform configuration for each stack defined in your
 application.
 
 To synthesize a CDK app, use the `cdktf synth` command. Let's check out the
 template synthesized from the sample app:
 
-{{% notice info %}} The **CDKTF CLI** requires you to be in the same directory 
-as your `cdktf.json` file. If you have changed directories in your terminal, 
+{{% notice info %}} The **CDKTF CLI** requires you to be in the same directory
+as your `cdktf.json` file. If you have changed directories in your terminal,
 please navigate back now.{{% /notice %}}
 
 ```
 cdktf synth
 ```
 
-<!-- TODO: Replace with generated cdk.tf.json -->
-Will output the following CloudFormation template:
+Will output the following Terraform configuration:
 
-```yaml
-Resources:
-  CdkWorkshopQueue50D9D426:
-    Type: AWS::SQS::Queue
-    Properties:
-      VisibilityTimeout: 300
-    Metadata:
-      aws:cdk:path: CdkWorkshopStack/CdkWorkshopQueue/Resource
-  CdkWorkshopQueuePolicyAF2494A5:
-    Type: AWS::SQS::QueuePolicy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Action: sqs:SendMessage
-            Condition:
-              ArnEquals:
-                aws:SourceArn:
-                  Ref: CdkWorkshopTopicD368A42F
-            Effect: Allow
-            Principal:
-              Service: sns.amazonaws.com
-            Resource:
-              Fn::GetAtt:
-                - CdkWorkshopQueue50D9D426
-                - Arn
-        Version: "2012-10-17"
-      Queues:
-        - Ref: CdkWorkshopQueue50D9D426
-    Metadata:
-      aws:cdk:path: CdkWorkshopStack/CdkWorkshopQueue/Policy/Resource
-  CdkWorkshopQueueCdkWorkshopStackCdkWorkshopTopicD7BE96438B5AD106:
-    Type: AWS::SNS::Subscription
-    Properties:
-      Protocol: sqs
-      TopicArn:
-        Ref: CdkWorkshopTopicD368A42F
-      Endpoint:
-        Fn::GetAtt:
-          - CdkWorkshopQueue50D9D426
-          - Arn
-    Metadata:
-      aws:cdk:path: CdkWorkshopStack/CdkWorkshopQueue/CdkWorkshopStackCdkWorkshopTopicD7BE9643/Resource
-  CdkWorkshopTopicD368A42F:
-    Type: AWS::SNS::Topic
-    Metadata:
-      aws:cdk:path: CdkWorkshopStack/CdkWorkshopTopic/Resource
-  CDKMetadata:
-    Type: AWS::CDK::Metadata
-    Properties:
-      Modules: aws-cdk=1.21.1,@aws-cdk/aws-cloudwatch=1.21.1,@aws-cdk/aws-iam=1.21.1,@aws-cdk/aws-kms=1.21.1,@aws-cdk/aws-sns=1.21.1,@aws-cdk/aws-sns-subscriptions=1.21.1,@aws-cdk/aws-sqs=1.21.1,@aws-cdk/core=1.21.1,@aws-cdk/cx-api=1.21.1,@aws-cdk/region-info=1.21.1,jsii-runtime=node.js/v13.6.0
-    Condition: CDKMetadataAvailable
-Conditions:
-  CDKMetadataAvailable:
-    Fn::Or:
-      - Fn::Or:
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-east-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-northeast-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-northeast-2
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-south-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-southeast-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-southeast-2
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ca-central-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - cn-north-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - cn-northwest-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-central-1
-      - Fn::Or:
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-north-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-west-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-west-2
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-west-3
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - me-south-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - sa-east-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - us-east-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - us-east-2
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - us-west-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - us-west-2
+```json
+{
+  "//": {
+    "metadata": {
+      "backend": "local",
+      "stackName": "cdk-workshop",
+      "version": "0.21.0"
+    },
+    "outputs": {
+    }
+  },
+  "data": {
+    "aws_caller_identity": {
+      "CallerIdentity": {
+        "//": {
+          "metadata": {
+            "path": "cdk-workshop/CallerIdentity",
+            "uniqueId": "CallerIdentity"
+          }
+        },
+        "provider": "aws"
+      }
+    },
+    "aws_iam_policy_document": {
+      "CdkWorkshopQueue_Policy_E8C1B641": {
+        "//": {
+          "metadata": {
+            "path": "cdk-workshop/CdkWorkshopQueue/Policy/Policy/Resource",
+            "uniqueId": "CdkWorkshopQueue_Policy_E8C1B641"
+          }
+        },
+        "statement": [
+          {
+            "actions": [
+              "sqs:SendMessage"
+            ],
+            "condition": [
+              {
+                "test": "ArnEquals",
+                "values": [
+                  "${aws_sns_topic.CdkWorkshopTopic_D368A42F.arn}"
+                ],
+                "variable": "aws:SourceArn"
+              }
+            ],
+            "effect": "Allow",
+            "principals": [
+              {
+                "identifiers": [
+                  "${data.aws_service_principal.aws_svcp_default_region_sns.name}"
+                ],
+                "type": "Service"
+              }
+            ],
+            "resources": [
+              "${aws_sqs_queue.CdkWorkshopQueue_50D9D426.arn}"
+            ]
+          }
+        ]
+      }
+    },
+    "aws_partition": {
+      "Partitition": {
+        "//": {
+          "metadata": {
+            "path": "cdk-workshop/Partitition",
+            "uniqueId": "Partitition"
+          }
+        },
+        "provider": "aws"
+      }
+    },
+    "aws_service_principal": {
+      "aws_svcp_default_region_sns": {
+        "//": {
+          "metadata": {
+            "path": "cdk-workshop/aws_svcp_default_region_sns}",
+            "uniqueId": "aws_svcp_default_region_sns"
+          }
+        },
+        "service_name": "sns"
+      }
+    }
+  },
+  "provider": {
+    "aws": [
+      {
+        "region": "us-east-1"
+      }
+    ]
+  },
+  "resource": {
+    "aws_sns_topic": {
+      "CdkWorkshopTopic_D368A42F": {
+        "//": {
+          "metadata": {
+            "path": "cdk-workshop/CdkWorkshopTopic/Resource",
+            "uniqueId": "CdkWorkshopTopic_D368A42F"
+          }
+        },
+        "tags": {
+          "Name": "dev-CdkWorkshopTopic",
+          "grid:EnvironmentName": "dev",
+          "grid:UUID": "cdk-workshop-dev"
+        }
+      }
+    },
+    "aws_sns_topic_subscription": {
+      "CdkWorkshopQueue_cdk-workshopCdkWorkshopTopicA7BCA841_F6BFFB7B": {
+        "//": {
+          "metadata": {
+            "path": "cdk-workshop/CdkWorkshopQueue/cdk-workshopCdkWorkshopTopicA7BCA841/Resource",
+            "uniqueId": "CdkWorkshopQueue_cdk-workshopCdkWorkshopTopicA7BCA841_F6BFFB7B"
+          }
+        },
+        "depends_on": [
+          "data.aws_iam_policy_document.CdkWorkshopQueue_Policy_E8C1B641",
+          "aws_sqs_queue_policy.CdkWorkshopQueue_Policy_AF2494A5"
+        ],
+        "endpoint": "${aws_sqs_queue.CdkWorkshopQueue_50D9D426.arn}",
+        "protocol": "sqs",
+        "topic_arn": "${aws_sns_topic.CdkWorkshopTopic_D368A42F.arn}"
+      }
+    },
+    "aws_sqs_queue": {
+      "CdkWorkshopQueue_50D9D426": {
+        "//": {
+          "metadata": {
+            "path": "cdk-workshop/CdkWorkshopQueue/Resource",
+            "uniqueId": "CdkWorkshopQueue_50D9D426"
+          }
+        },
+        "name_prefix": "cdk-workshop-dev-cdk-workshopCdkWorkshopQueue",
+        "tags": {
+          "Name": "dev-CdkWorkshopQueue",
+          "grid:EnvironmentName": "dev",
+          "grid:UUID": "cdk-workshop-dev"
+        },
+        "visibility_timeout_seconds": 300
+      }
+    },
+    "aws_sqs_queue_policy": {
+      "CdkWorkshopQueue_Policy_AF2494A5": {
+        "//": {
+          "metadata": {
+            "path": "cdk-workshop/CdkWorkshopQueue/Policy/Resource",
+            "uniqueId": "CdkWorkshopQueue_Policy_AF2494A5"
+          }
+        },
+        "policy": "${data.aws_iam_policy_document.CdkWorkshopQueue_Policy_E8C1B641.json}",
+        "queue_url": "${aws_sqs_queue.CdkWorkshopQueue_50D9D426.url}"
+      }
+    }
+  },
+  "terraform": {
+    "backend": {
+      "local": {
+        "path": "<path-to-folder>/cdk-workshop/terraform.cdk-workshop.tfstate"
+      }
+    },
+    "required_providers": {
+      "aws": {
+        "source": "aws",
+        "version": "5.100.0"
+      }
+    }
+  }
+}
 ```
 
 As you can see, this template includes four resources:
 
-- **AWS::SQS::Queue** - our queue
-- **AWS::SNS::Topic** - our topic
-- **AWS::SNS::Subscription** - the subscription between the queue and the topic
-- **AWS::SQS::QueuePolicy** - the IAM policy which allows this topic to send messages to the queue
+- **aws_sqs_queue** - our queue
+- **aws_sns_topic** - our topic
+- **aws_sns_topic_subscriptionn** - the subscription between the queue and the topic
+- **aws_sqs_queue_policy** - the IAM policy which allows this topic to send messages to the queue
 
-{{% notice info %}} The **AWS::CDK::Metadata** resource is automatically added
-by the toolkit to every stack. It is used by the AWS CDK team for analytics and
-to allow us to identify versions with security issues. See [Version Reporting](https://docs.aws.amazon.com/cdk/latest/guide/tools.html) in
-the AWS CDK User Guide for more details. We will omit the metadata resource in
-diff views for the rest of this workshop {{% /notice %}}
+{{% notice info %}} **metadata** is automatically added per resource by the toolkit
+to every stack to ease analysis. Terraform ignores the metadata in diff views
+{{% /notice %}}
 
 {{< nextprevlinks >}}

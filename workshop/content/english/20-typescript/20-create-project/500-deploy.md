@@ -3,101 +3,103 @@ title = "CDKTF deploy"
 weight = 500
 +++
 
-Okay, we've got a CloudFormation template. What's next? __Let's deploy it into our account!__
-
-## Bootstrapping an environment
-
-The first time you deploy an AWS CDK app into an environment (account/region),
-you can install a "bootstrap stack". This stack includes resources that
-are used in the toolkit's operation. For example, the stack includes an S3
-bucket that is used to store templates and assets during the deployment process.
-
-You can use the `cdktf bootstrap` command to install the bootstrap stack into an
-environment:
-
-```
-cdk bootstrap
-```
-
-Then:
-
-```
- ⏳  Bootstrapping environment aws://123456789012/us-east-1...
-...
-```
-
-{{% notice info %}}
-If you are returned an Access Denied message at this step, verify that
-you have [configured the AWS CLI correctly](/15-prerequisites/200-account.html) (or, specified an appropriate secret/access key), and also verify that you have permission to call `cloudformation:CreateChangeSet` within the scope of your [account/session](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
-{{% /notice %}}
+Okay, we've got a Terraform configuration. What's next? __Let's deploy it into our account!__
 
 ## Let's deploy
 
 Use `cdktf deploy` to deploy a CDK app:
 
 ```
-cdk deploy
+cdktf deploy
 ```
 
-You will first be informed of security-related changes that the CDK is going to perform on your behalf, if there are any security-related changes
+The Terraform configuration is first used to initialize `terraform`.
 
-<!-- update to https://developer.hashicorp.com/terraform/tutorials/cdktf/cdktf-build#provision-infrastructure -->
+```
+cdk-workshop  Initializing the backend...
+cdk-workshop
+              Successfully configured the backend "local"! Terraform will automatically
+              use this backend unless the backend configuration changes.
+cdk-workshop  Initializing provider plugins...
+              - Finding hashicorp/aws versions matching "5.100.0"...
+cdk-workshop  - Installing hashicorp/aws v5.100.0...
+              ....
+
+
+0 Stacks deploying     0 Stacks done     1 Stack waiting
+```
+
+Once initialised a `plan` will be presented
+
 ```text
-This deployment will make potentially sensitive changes according to your current security approval level (--require-approval broadening).
-Please confirm you intend to make the following modifications:
+Plan: 4 to add, 0 to change, 0 to destroy.
 
-IAM Statement Changes
-┌───┬────────────────────────────────┬────────┬─────────────────┬────────────────────────────────┬────────────────────────────────┐
-│   │ Resource                       │ Effect │ Action          │ Principal                      │ Condition                      │
-├───┼────────────────────────────────┼────────┼─────────────────┼────────────────────────────────┼────────────────────────────────┤
-│ + │ ${CdktfWorkshopQueue.Arn}      │ Allow  │ sqs:SendMessage │ Service:sns.amazonaws.com      │ "ArnEquals": {                 │
-│   │                                │        │                 │                                │ "aws:SourceArn": "${CdktfWorks │
-│   │                                │        │                 │                                │ hopTopic}"                     │
-│   │                                │        │                 │                                │ }                              │
-└───┴────────────────────────────────┴────────┴─────────────────┴────────────────────────────────┴────────────────────────────────┘
-(NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299)
+              Do you want to perform these actions?
+                Terraform will perform the actions described above.
+                Only 'yes' will be accepted to approve.
 
-Do you wish to deploy these changes (y/n)?
+Please review the diff output above for cdk-workshop
+❯ Approve  Applies the changes outlined in the plan.
+  Dismiss
+  Stop
 ```
 
-This is warning you that deploying the app contains security-sensitive changes.
-Since we need to allow the topic to send messages to the queue,
-enter **y** to deploy the stack and create the resources.
+These are the changes that Terraform will make to your infrastructure. Choose `Approve` to apply these changes.
 
-Output should look like the following, where ACCOUNT-ID is your account ID, REGION is the region in which you created the app,
-and STACK-ID is the unique identifier for your stack:
+Output should look like the following:
 
 ```
-CdkWorkshopStack: deploying...
-CdkWorkshopStack: creating CloudFormation changeset...
+cdk-workshop  aws_sqs_queue.CdkWorkshopQueue_50D9D426: Creating...
+cdk-workshop  aws_sns_topic.CdkWorkshopTopic_D368A42F: Creating...
+cdk-workshop  aws_sns_topic.CdkWorkshopTopic_D368A42F: Creation complete after 3s [id=arn:aws:sns:us-east-1:694710432912:terraform-20250714065717423000000004]
+cdk-workshop  aws_sqs_queue.CdkWorkshopQueue_50D9D426: Still creating... [10s elapsed]
+cdk-workshop  aws_sqs_queue.CdkWorkshopQueue_50D9D426: Still creating... [20s elapsed]
+cdk-workshop  aws_sqs_queue.CdkWorkshopQueue_50D9D426: Creation complete after 29s [id=https://sqs.us-east-1.amazonaws.com/694710432912/cdk-workshop-dev-cdk-workshopCdkWorkshopQueue20250714065717422700000003]
+cdk-workshop  data.aws_iam_policy_document.CdkWorkshopQueue_Policy_E8C1B641 (CdkWorkshopQueue/Policy/Policy/Resource): Reading...
+cdk-workshop  data.aws_iam_policy_document.CdkWorkshopQueue_Policy_E8C1B641 (CdkWorkshopQueue/Policy/Policy/Resource): Read complete after 0s [id=2163801131]
+cdk-workshop  aws_sqs_queue_policy.CdkWorkshopQueue_Policy_AF2494A5: Creating...
+cdk-workshop  aws_sqs_queue_policy.CdkWorkshopQueue_Policy_AF2494A5: Still creating... [10s elapsed]
+cdk-workshop  aws_sqs_queue_policy.CdkWorkshopQueue_Policy_AF2494A5: Still creating... [20s elapsed]
+cdk-workshop  aws_sqs_queue_policy.CdkWorkshopQueue_Policy_AF2494A5: Creation complete after 27s [id=https://sqs.us-east-1.amazonaws.com/694710432912/cdk-workshop-dev-cdk-workshopCdkWorkshopQueue20250714065717422700000003]
+cdk-workshop  aws_sns_topic_subscription.CdkWorkshopQueue_cdk-workshopCdkWorkshopTopicA7BCA841_F6BFFB7B: Creating...
+cdk-workshop  aws_sns_topic_subscription.CdkWorkshopQueue_cdk-workshopCdkWorkshopTopicA7BCA841_F6BFFB7B: Creation complete after 2s [id=arn:aws:sns:us-east-1:694710432912:terraform-20250714065717423000000004:54d605d3-7a64-457e-90bc-5929b2f688bc]
+cdk-workshop
+              Apply complete! Resources: 4 added, 0 changed, 0 destroyed.
 
-
-
- ✅  CdktfWorkshopStack
-
-Stack ARN:
-arn:aws:cloudformation:REGION:ACCOUNT-ID:stack/CdkWorkshopStack/STACK-ID
+No outputs found.
 ```
 
-## The CloudFormation Console
+## The Terraform CLI
 
-CDKTF apps are deployed through AWS CloudFormation. Each CDKTF stack maps 1:1 with
-CloudFormation stack.
+CDKTF apps are deployed through `terraform` CLI. Each CDKTF stack maps 1:1 with
+a terraform folder under `cdktf.out/stacks/`.
 
-This means that you can use the AWS CloudFormation console in order to manage
+This means that you can use the `terraform` CLI in order to manage
 your stacks.
 
-Let's take a look at the [AWS CloudFormation
-console](https://console.aws.amazon.com/cloudformation/home).
+Let's take a look at the contents of the Terraform state.
 
-You will likely see something like this (if you don't, make sure you are in the correct region):
+You will likely see something like this:
 
-![](./cfn1.png)
+```
+cd cdktf.out/stacks/cdk-workshop
+terraform state list
+```
 
-If you select `CdktfWorkshopStack` and open the __Resources__ tab, you will see the
-physical identities of our resources:
+```text
+data.aws_caller_identity.CallerIdentity
+data.aws_iam_policy_document.CdkWorkshopQueue_Policy_E8C1B641
+data.aws_partition.Partitition
+data.aws_service_principal.aws_svcp_default_region_sns
+aws_sns_topic.CdkWorkshopTopic_D368A42F
+aws_sns_topic_subscription.CdkWorkshopQueue_cdk-workshopCdkWorkshopTopicA7BCA841_F6BFFB7B
+aws_sqs_queue.CdkWorkshopQueue_50D9D426
+aws_sqs_queue_policy.CdkWorkshopQueue_Policy_AF2494A5
+```
 
-![](./cfn2.png)
+To leverage powerful state management, learn more about [terraform here](https://developer.hashicorp.com/terraform).
+
+This workshop is focused on defining the infrastructure.
 
 # I am ready for some actual coding!
 

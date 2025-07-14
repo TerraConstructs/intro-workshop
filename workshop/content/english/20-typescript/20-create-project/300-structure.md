@@ -15,71 +15,41 @@ You'll see something like this:
 
 ![](./structure.png)
 
-* __`lib/cdktf-workshop-stack.ts`__ is where your CDKTF application's main stack is defined.
-  This is the file we'll be spending most of our time in.
-* `bin/cdktf-workshop.ts` is the entrypoint of the CDKTF application. It will load
-  the stack defined in `lib/cdktf-workshop-stack.ts`.
+* __`main.ts`__ is where your CDKTF application's main stack is defined.
+  This is the file we'll be spending most of our time in. this is also the entrypoint of the CDKTF application.
 * `package.json` is your npm module manifest. It includes information like the
   name of your app, version, dependencies and build scripts like "watch" and
   "build" (`package-lock.json` is maintained by npm)
 * `cdktf.json` tells the toolkit how to run your app. In our case it will be
-  `"npx ts-node bin/cdktf-workshop.ts"`
+  `"npx ts-node main.ts"`
 * `tsconfig.json` your project's [typescript
   configuration](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
-* `.gitignore` and `.npmignore` tell git and npm which files to include/exclude
-  from source control and when publishing this module to the package manager.
+* `.gitignore` tells git which files to include/exclude
+  from source control.
 * `node_modules` is maintained by npm and includes all your project's
   dependencies.
 
 ## Your app's entry point
 
-Let's have a quick look at `bin/cdktf-workshop.ts`:
-
-```js
-#!/usr/bin/env node
-import * as cdk from 'aws-cdktf-lib';
-import { CdktfWorkshopStack } from '../lib/cdktf-workshop-stack';
-
-const app = new cdk.App();
-new CdktfWorkshopStack(app, 'CdktfWorkshopStack');
-```
-
-This code loads and instantiates the `CdktfWorkshopStack` class from the
-`lib/cdktf-workshop-stack.ts` file. We won't need to look at this file anymore.
-
-## The main stack
-
-Open up `lib/cdktf-workshop-stack.ts`. This is where the meat of our application
-is:
+Let's have a quick look at `main.ts`:
 
 ```ts
-import * as cdk from 'cdktf';
-import * as sns from 'terraconstructs/notify';
-import * as subs from 'terraconstructs/notify/subscriptions';
-import * as sqs from 'terraconstructs/notify';
+import { Construct } from "constructs";
+import { App, TerraformStack } from "cdktf";
 
-export class CdkWorkshopStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+class MyStack extends TerraformStack {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
 
-    const queue = new sqs.Queue(this, 'CdkWorkshopQueue', {
-      visibilityTimeout: cdk.Duration.seconds(300)
-    });
-
-    const topic = new sns.Topic(this, 'CdkWorkshopTopic');
-
-    topic.addSubscription(new subs.SqsSubscription(queue));
+    // define resources here
   }
 }
+
+const app = new App();
+new MyStack(app, "cdk-workshop");
+app.synth();
 ```
 
-As you can see, our app was created with a sample CDK stack
-(`CdkWorkshopStack`).
-
-The stack includes:
-
-- SQS Queue (`new sqs.Queue`)
-- SNS Topic (`new sns.Topic`)
-- Subscribes the queue to receive any messages published to the topic (`topic.addSubscription`)
+This code defines, loads and instantiates the `MyStack` class. This is where the meat of our application is, the stack is empty for now.
 
 {{< nextprevlinks >}}

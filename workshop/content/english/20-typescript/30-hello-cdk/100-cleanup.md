@@ -5,22 +5,35 @@ weight = 100
 
 ## Delete the sample code from your stack
 
-The project created by `cdktf init sample-app` includes an SQS queue, and an SNS topic. We're
-not going to use them in our project, so remove them from your the
-`CdktfWorkshopStack` constructor.
+The project from previous section used an SQS queue, and an SNS topic for demonstration purposes. We're
+not going to use them in this project, so remove them from your the
+`MyStack` constructor.
 
-Open `lib/cdk-workshop-stack.ts` and clean it up. Eventually it should look like this:
+Open `main.ts` and clean it up. Eventually it should look like this:
 
 ```ts
-import * as cdk from 'cdktf';
+import { App } from "cdktf";
+import { Construct } from "constructs";
+import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
 
-export class CdkWorkshopStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+class MyStack extends AwsStack {
+  constructor(scope: Construct, id: string, props: AwsStackProps) {
     super(scope, id, props);
 
-    // nothing here!
+    // Fresh start
   }
 }
+
+const app = new App();
+new MyStack(app, "cdk-workshop", {
+  environmentName: "dev",
+  gridUUID: "cdk-workshop-dev",
+  providerConfig: {
+    region: "us-east-1",
+  },
+});
+app.synth();
+
 ```
 
 ## cdk diff
@@ -34,31 +47,69 @@ cdktf diff
 
 Output should look like the following:
 
-<!-- TODO: Replace with resources with cdk.tf.json fyi -->
-```
-Stack CdkWorkshopStack
-IAM Statement Changes
-┌───┬─────────────────────────────────┬────────┬─────────────────┬───────────────────────────┬──────────────────────────────────────────────────┐
-│   │ Resource                        │ Effect │ Action          │ Principal                 │ Condition                                        │
-├───┼─────────────────────────────────┼────────┼─────────────────┼───────────────────────────┼──────────────────────────────────────────────────┤
-│ - │ ${CdktfWorkshopQueue50D9D426.Arn} │ Allow  │ sqs:SendMessage │ Service:sns.amazonaws.com │ "ArnEquals": {                                   │
-│   │                                 │        │                 │                           │   "aws:SourceArn": "${CdktfWorkshopTopicD368A42F}" │
-│   │                                 │        │                 │                           │ }                                                │
-└───┴─────────────────────────────────┴────────┴─────────────────┴───────────────────────────┴──────────────────────────────────────────────────┘
-(NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299)
+```text
+cdk-workshop  Terraform used the selected providers to generate the following execution
+              plan. Resource actions are indicated with the following symbols:
+                - destroy
 
-Resources
-[-] AWS::SQS::Queue CdktfWorkshopQueue50D9D426 destroy
-[-] AWS::SQS::QueuePolicy CdktfWorkshopQueuePolicyAF2494A5 destroy
-[-] AWS::SNS::Topic CdktfWorkshopTopicD368A42F destroy
-[-] AWS::SNS::Subscription CdktfWorkshopTopicCdktfWorkshopQueueSubscription88D211C7 destroy
+              Terraform will perform the following actions:
+cdk-workshop    # aws_sns_topic.CdkWorkshopTopic_D368A42F will be destroyed
+                # (because aws_sns_topic.CdkWorkshopTopic_D368A42F is not in configuration)
+                - resource "aws_sns_topic" "CdkWorkshopTopic_D368A42F" {
+                    - application_success_feedback_sample_rate = 0 -> null
+                    - arn                                      = "arn:aws:sns:us-east-1:694710432912:vincent-topic" -> null
+                    - content_based_deduplication              = false -> null
+                    - fifo_topic                               = false -> null
+                    - firehose_success_feedback_sample_rate    = 0 -> null
+                    - http_success_feedback_sample_rate        = 0 -> null
+                    - id                                       = "arn:aws:sns:us-east-1:694710432912:vincent-topic" -> null
+                    - lambda_success_feedback_sample_rate      = 0 -> null
+                    - name                                     = "vincent-topic" -> null
+                    - owner                                    = "694710432912" -> null
+                    ...
+
+                # aws_sqs_queue_policy.CdkWorkshopQueue_Policy_AF2494A5 will be destroyed
+                # (because aws_sqs_queue_policy.CdkWorkshopQueue_Policy_AF2494A5 is not in configuration)
+                - resource "aws_sqs_queue_policy" "CdkWorkshopQueue_Policy_AF2494A5" {
+                    - id        = "https://sqs.us-east-1.amazonaws.com/694710432912/vincentcdk-workshopCdkWorkshopQueue20250714071913743900000002" -> null
+                    - policy    = jsonencode(
+                          {
+                            - Statement = [
+                                - {
+                                    - Action    = "sqs:SendMessage"
+                                    - Condition = {
+                                        - ArnEquals = {
+                                            - "aws:SourceArn" = "arn:aws:sns:us-east-1:694710432912:vincent-topic"
+                                          }
+                                      }
+                                    - Effect    = "Allow"
+                                    - Principal = {
+                                        - Service = "sns.amazonaws.com"
+                                      }
+                                    - Resource  = "arn:aws:sqs:us-east-1:694710432912:vincentcdk-workshopCdkWorkshopQueue20250714071913743900000002"
+                                  },
+                              ]
+                            - Version   = "2012-10-17"
+                          }
+                      ) -> null
+                    - queue_url = "https://sqs.us-east-1.amazonaws.com/694710432912/vincentcdk-workshopCdkWorkshopQueue20250714071913743900000002" -> null
+                  }
+
+              Plan: 0 to add, 0 to change, 4 to destroy.
+
+              ─────────────────────────────────────────────────────────────────────────────
+
+              Saved the plan to: plan
+
+              To perform exactly these actions, run the following command to apply:
+                  terraform apply "plan"
 ```
 
 As expected, all of our resources are going to be brutally destroyed.
 
 ## cdktf deploy
 
-Run `cdktf deploy` and __proceed to the next section__ (no need to wait):
+Run `cdktf deploy` and wait for a final `Approve`, then __proceed to the next section__
 
 ```
 cdktf deploy
