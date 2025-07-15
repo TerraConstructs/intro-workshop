@@ -10,7 +10,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "1.8.3",
-        "@types/node": "^20.14.11",
+        "@types/node": "^24.0.14",
         "cdktf": "^0.21.0",
         "cdktf-cli": "^0.21.0",
         "constructs": "^10.4.2",
