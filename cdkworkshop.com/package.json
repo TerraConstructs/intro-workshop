@@ -9,7 +9,7 @@
         "synth": "npm run build && npx cdktf synth"
     },
     "devDependencies": {
-        "@biomejs/biome": "1.8.3",
+        "@biomejs/biome": "2.1.1",
         "@types/node": "^20.14.11",
         "cdktf": "^0.21.0",
         "cdktf-cli": "^0.21.0",
