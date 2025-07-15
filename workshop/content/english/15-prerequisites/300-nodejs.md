@@ -4,8 +4,8 @@ chapter = false
 weight = 300
 +++
 
-The Terraform CDK uses Node.js (>= 18).
-A version in active long-term support (20.x at this writing) is recommended.
+The Terraform CDK uses Node.js (>= 20.9.0).
+A version in active long-term support (22.x at this writing) is recommended.
 
 * To install Node.js visit the [node.js](https://nodejs.org) website.
 
