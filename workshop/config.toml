@@ -1,4 +1,4 @@
-baseURL = "https://workshop.terraconstructs.dev/aws"
+baseURL = "https://aws-workshop.terraconstructs.dev/"
 languageCode = "en-us"
 defaultContentLanguage = "en"
 title = "TerraConstructs AWS Workshop"
