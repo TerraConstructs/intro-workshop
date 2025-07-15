@@ -6,11 +6,11 @@ weight = 400
 ## Synthesize configuration from your app
 
 CDKTF apps are effectively only a __definition__ of your infrastructure using
-code. When CDKTF apps are executed, they produce (or "__synthesize__", in CDKTF
+code. When CDKTF apps are executed, they produce (or "__synthesize__", in CDK
 parlance) a Terraform configuration for each stack defined in your
 application.
 
-To synthesize a CDK app, use the `cdktf synth` command. Let's check out the
+To synthesize a CDKTF app, use the `cdktf synth` command. Let's check out the
 template synthesized from the sample app:
 
 {{% notice info %}} The **CDKTF CLI** requires you to be in the same directory
@@ -21,7 +21,7 @@ please navigate back now.{{% /notice %}}
 cdktf synth
 ```
 
-Will output the following Terraform configuration:
+Will output the following Terraform configuration (under `cdktf.out/stacks/cdk-workshop`):
 
 ```json
 {
@@ -201,7 +201,7 @@ As you can see, this template includes four resources:
 - **aws_sqs_queue_policy** - the IAM policy which allows this topic to send messages to the queue
 
 {{% notice info %}} **metadata** is automatically added per resource by the toolkit
-to every stack to ease analysis. Terraform ignores the metadata in diff views
+to every stack to ease analysis. Terraform ignores the metadata.
 {{% /notice %}}
 
 {{< nextprevlinks >}}

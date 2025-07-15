@@ -84,9 +84,11 @@ new MyStack(app, "cdk-workshop", {
 app.synth();
 {{</highlight>}}
 
-## Shared Workshop AWS Account
+## Shared AWS Account
 
-{{% notice info %}} If sharing AWS Account with others during the workshop, add identifiers to avoid conflicts{{% /notice %}}
+{{% notice danger %}} Workshops ran on shared AWS Accounts require identifiers to avoid name conflicts{{% /notice %}}
+
+Use the `topicName` or `namePrefix` properties to make your resource identities unique:
 
 {{<highlight ts "hl_lines=12 16-18">}}
 import { App } from "cdktf";

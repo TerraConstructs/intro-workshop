@@ -164,7 +164,7 @@ double check!
 
 ## CDKTF Watch
 
-{{% notice info %}} The watch command is experimental, so you should only use it in development environments. It also automatically deploys all changes without asking for confirmation.
+{{% notice warning %}} The watch command is experimental, so you should only use it in development environments. It also automatically deploys all changes without asking for confirmation.
 {{% /notice %}}
 
 <!-- We can do better than calling `cdktf deploy` or `cdktf deploy --hotswap` each time. -->

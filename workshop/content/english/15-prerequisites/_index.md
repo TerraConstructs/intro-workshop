@@ -1,7 +1,7 @@
 +++
 title = "Prerequisites"
 bookCollapseSection = true
-bookFlatSection = true 
+bookFlatSection = true
 weight = 15
 +++
 
@@ -11,8 +11,10 @@ To perform this workshop, you'll need the following:
 
 {{< children showhidden="false" />}}
 
+{{% notice warning %}}
 Node.js is always required to use CDK, but all other language prerequisites
-are only required if building a CDK app in that specific language
+are only required if building a CDK app in that specific language.
+{{% /notice %}}
 
 You can skip any of these steps if you have these tools already installed on
 your machine.

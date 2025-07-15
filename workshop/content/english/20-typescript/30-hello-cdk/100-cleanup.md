@@ -5,9 +5,9 @@ weight = 100
 
 ## Delete the sample code from your stack
 
-The project from previous section used an SQS queue, and an SNS topic for demonstration purposes. We're
-not going to use them in this project, so remove them from your the
-`MyStack` constructor.
+The project from previous section used an SQS queue, and an SNS topic
+for demonstration purposes. We're not going to use them in this project,
+so remove them from the `MyStack` constructor.
 
 Open `main.ts` and clean it up. Eventually it should look like this:
 
@@ -36,9 +36,9 @@ app.synth();
 
 ```
 
-## cdk diff
+## cdktf diff
 
-Now that we modified our stack's contents, we can ask the toolkit to show us the difference between our CDK app and
+Now that we modified our stack's contents, we can ask the toolkit to show us the difference between our CDKTF app and
 what's currently deployed. This is a safe way to check what will happen once we run `cdktf deploy` and is always good practice:
 
 ```

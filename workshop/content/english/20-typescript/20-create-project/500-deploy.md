@@ -7,7 +7,7 @@ Okay, we've got a Terraform configuration. What's next? __Let's deploy it into o
 
 ## Let's deploy
 
-Use `cdktf deploy` to deploy a CDK app:
+Use `cdktf deploy` to deploy a CDKTF app:
 
 ```
 cdktf deploy
@@ -71,10 +71,10 @@ No outputs found.
 
 ## The Terraform CLI
 
-CDKTF apps are deployed through `terraform` CLI. Each CDKTF stack maps 1:1 with
-a terraform folder under `cdktf.out/stacks/`.
+Under the hood CDKTF apps are still simply deployed through the `terraform` CLI.
+Each CDKTF stack maps 1:1 with a terraform folder under `cdktf.out/stacks/`.
 
-This means that you can use the `terraform` CLI in order to manage
+This means that you can also use the `terraform` CLI in order to manage
 your stacks.
 
 Let's take a look at the contents of the Terraform state.
@@ -97,7 +97,7 @@ aws_sqs_queue.CdkWorkshopQueue_50D9D426
 aws_sqs_queue_policy.CdkWorkshopQueue_Policy_AF2494A5
 ```
 
-To leverage powerful state management, learn more about [terraform here](https://developer.hashicorp.com/terraform).
+To leverage powerful state management, learn more about Terraform [here](https://developer.hashicorp.com/terraform).
 
 This workshop is focused on defining the infrastructure.
 
