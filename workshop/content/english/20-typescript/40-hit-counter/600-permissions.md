@@ -9,37 +9,40 @@ Let's give our Lambda's execution role permissions to read/write from our table.
 
 Go back to `hitcounter.ts` and add the following highlighted lines:
 
-{{<highlight ts "hl_lines=33-34">}}
-import * as cdk from 'aws-cdk-lib';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import { Construct } from 'constructs';
+{{<highlight ts "hl_lines=36-37">}}
+import { Construct } from "constructs";
+import {
+  Code,
+  LambdaFunction,
+  IFunction,
+  Runtime,
+} from "terraconstructs/lib/aws/compute";
+import { AttributeType, Table } from "terraconstructs/lib/aws/storage";
 
 export interface HitCounterProps {
   /** the function for which we want to count url hits **/
-  downstream: lambda.IFunction;
+  downstream: IFunction;
 }
 
 export class HitCounter extends Construct {
-
   /** allows accessing the counter function */
-  public readonly handler: lambda.Function;
+  public readonly handler: LambdaFunction;
 
   constructor(scope: Construct, id: string, props: HitCounterProps) {
     super(scope, id);
 
-    const table = new dynamodb.Table(this, 'Hits', {
-        partitionKey: { name: 'path', type: dynamodb.AttributeType.STRING }
+    const table = new Table(this, "Hits", {
+      partitionKey: { name: "path", type: AttributeType.STRING },
     });
 
-    this.handler = new lambda.Function(this, 'HitCounterHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'hitcounter.handler',
-      code: lambda.Code.fromAsset('lambda'),
+    this.handler = new LambdaFunction(this, "HitCounterHandler", {
+      runtime: Runtime.NODEJS_22_X,
+      handler: "hitcounter.handler",
+      code: Code.fromAsset("lambda"),
       environment: {
         DOWNSTREAM_FUNCTION_NAME: props.downstream.functionName,
-        HITS_TABLE_NAME: table.tableName
-      }
+        HITS_TABLE_NAME: table.tableName,
+      },
     });
 
     // grant the lambda role read/write permissions to our table
@@ -53,7 +56,7 @@ export class HitCounter extends Construct {
 Save & deploy:
 
 ```
-cdk deploy
+cdktf deploy
 ```
 
 ## Test again
@@ -81,19 +84,21 @@ Still getting this pesky 5xx error! Let's look at our CloudWatch logs again
 
 ```json
 {
-    "errorMessage": "User: arn:aws:sts::585695036304:assumed-role/CdkWorkshopStack-HelloHitCounterHitCounterHandlerS-TU5M09L1UBID/CdkWorkshopStack-HelloHitCounterHitCounterHandlerD-144HVUNEWRWEO is not authorized to perform: lambda:InvokeFunction on resource: arn:aws:lambda:us-east-1:585695036304:function:CdkWorkshopStack-HelloHandler2E4FBA4D-149MVAO4969O7",
     "errorType": "AccessDeniedException",
-    "stackTrace": [
-        "Object.extractError (/var/runtime/node_modules/aws-sdk/lib/protocol/json.js:48:27)",
-        "Request.extractError (/var/runtime/node_modules/aws-sdk/lib/protocol/rest_json.js:52:8)",
-        "Request.callListeners (/var/runtime/node_modules/aws-sdk/lib/sequential_executor.js:105:20)",
-        "Request.emit (/var/runtime/node_modules/aws-sdk/lib/sequential_executor.js:77:10)",
-        "Request.emit (/var/runtime/node_modules/aws-sdk/lib/request.js:683:14)",
-        "Request.transition (/var/runtime/node_modules/aws-sdk/lib/request.js:22:10)",
-        "AcceptorStateMachine.runTo (/var/runtime/node_modules/aws-sdk/lib/state_machine.js:14:12)",
-        "/var/runtime/node_modules/aws-sdk/lib/state_machine.js:26:10",
-        "Request.<anonymous> (/var/runtime/node_modules/aws-sdk/lib/request.js:38:9)",
-        "Request.<anonymous> (/var/runtime/node_modules/aws-sdk/lib/request.js:685:12)"
+    "errorMessage": "User: arn:aws:sts::694710432912:assumed-role/cdk-workshop-dev-cdrHandlerServiceRole20250715042121401600000001/cdk-workshop-dev-cderHitCounterHandler is not authorized to perform: lambda:InvokeFunction on resource: arn:aws:lambda:us-east-1:694710432912:function:cdk-workshop-dev-cdorkshopHelloHandler because no identity-based policy allows the lambda:InvokeFunction action",
+    "name": "AccessDeniedException",
+    "message": "User: arn:aws:sts::694710432912:assumed-role/cdk-workshop-dev-cdrHandlerServiceRole20250715042121401600000001/cdk-workshop-dev-cderHitCounterHandler is not authorized to perform: lambda:InvokeFunction on resource: arn:aws:lambda:us-east-1:694710432912:function:cdk-workshop-dev-cdorkshopHelloHandler because no identity-based policy allows the lambda:InvokeFunction action",
+    "stack": [
+        "AccessDeniedException: User: arn:aws:sts::694710432912:assumed-role/cdk-workshop-dev-cdrHandlerServiceRole20250715042121401600000001/cdk-workshop-dev-cderHitCounterHandler is not authorized to perform: lambda:InvokeFunction on resource: arn:aws:lambda:us-east-1:694710432912:function:cdk-workshop-dev-cdorkshopHelloHandler because no identity-based policy allows the lambda:InvokeFunction action",
+        "    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:867:20)",
+        "    at /var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:876:5",
+        "    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-lambda/dist-cjs/index.js:4061:14)",
+        "    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)",
+        "    at async /var/runtime/node_modules/@aws-sdk/node_modules/@smithy/middleware-serde/dist-cjs/index.js:35:20",
+        "    at async /var/runtime/node_modules/@aws-sdk/node_modules/@smithy/core/dist-cjs/index.js:193:18",
+        "    at async /var/runtime/node_modules/@aws-sdk/node_modules/@smithy/middleware-retry/dist-cjs/index.js:320:38",
+        "    at async /var/runtime/node_modules/@aws-sdk/middleware-logger/dist-cjs/index.js:33:22",
+        "    at async exports.handler (/var/task/hitcounter.js:25:23)"
     ]
 }
 ```
@@ -105,9 +110,14 @@ User: <VERY-LONG-STRING> is not authorized to perform: lambda:InvokeFunction on 
 ```
 
 So it seems like our hit counter actually managed to write to the database. We can confirm by
-going to the [DynamoDB Console](https://console.aws.amazon.com/dynamodb/home):
+going to the [DynamoDB Console](https://console.aws.amazon.com/dynamodb/home) and exploring
+the table items:
 
 ![](./logs5.png)
+
+We should see the count for `/` path is incrementing now:
+
+![](./logs6.png)
 
 But, we must also give our hit counter permissions to invoke the downstream lambda function.
 
@@ -115,37 +125,41 @@ But, we must also give our hit counter permissions to invoke the downstream lamb
 
 Add the highlighted lines to `lib/hitcounter.ts`:
 
-{{<highlight ts "hl_lines=36-37">}}
-import * as cdk from 'aws-cdk-lib';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import { Construct } from 'constructs';
+
+{{<highlight ts "hl_lines=39-40">}}
+import { Construct } from "constructs";
+import {
+  Code,
+  LambdaFunction,
+  IFunction,
+  Runtime,
+} from "terraconstructs/lib/aws/compute";
+import { AttributeType, Table } from "terraconstructs/lib/aws/storage";
 
 export interface HitCounterProps {
   /** the function for which we want to count url hits **/
-  downstream: lambda.IFunction;
+  downstream: IFunction;
 }
 
 export class HitCounter extends Construct {
-
   /** allows accessing the counter function */
-  public readonly handler: lambda.Function;
+  public readonly handler: LambdaFunction;
 
   constructor(scope: Construct, id: string, props: HitCounterProps) {
     super(scope, id);
 
-    const table = new dynamodb.Table(this, 'Hits', {
-        partitionKey: { name: 'path', type: dynamodb.AttributeType.STRING }
+    const table = new Table(this, "Hits", {
+      partitionKey: { name: "path", type: AttributeType.STRING },
     });
 
-    this.handler = new lambda.Function(this, 'HitCounterHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'hitcounter.handler',
-      code: lambda.Code.fromAsset('lambda'),
+    this.handler = new LambdaFunction(this, "HitCounterHandler", {
+      runtime: Runtime.NODEJS_22_X,
+      handler: "hitcounter.handler",
+      code: Code.fromAsset("lambda"),
       environment: {
         DOWNSTREAM_FUNCTION_NAME: props.downstream.functionName,
-        HITS_TABLE_NAME: table.tableName
-      }
+        HITS_TABLE_NAME: table.tableName,
+      },
     });
 
     // grant the lambda role read/write permissions to our table
@@ -159,37 +173,60 @@ export class HitCounter extends Construct {
 
 ## Diff
 
-You can check what this did using `cdk diff`:
+You can check what this did using `cdktf diff`:
 
 ```
-cdk diff
+cdktf diff
 ```
 
-The **Resource** section should look something like this,
+The **aws_iam_role_policy** section should look something like this,
 which shows the IAM statement was added to the role:
 
 ```
-Resources
-[~] AWS::IAM::Policy HelloHitCounter/HitCounterHandler/ServiceRole/DefaultPolicy HelloHitCounterHitCounterHandlerServiceRoleDefaultPolicy1487A60A
- └─ [~] PolicyDocument
-     └─ [~] .Statement:
-         └─ @@ -19,5 +19,15 @@
-            [ ]         "Arn"
-            [ ]       ]
-            [ ]     }
-            [+]   },
-            [+]   {
-            [+]     "Action": "lambda:InvokeFunction",
-            [+]     "Effect": "Allow",
-            [+]     "Resource": {
-            [+]       "Fn::GetAtt": [
-            [+]         "HelloHandler2E4FBA4D",
-            [+]         "Arn"
-            [+]       ]
-            [+]     }
-            [ ]   }
-            [ ] ]
+cdk-workshop    # aws_iam_role_policy.HelloHitCounter_HitCounterHandler_ServiceRole_DefaultPolicy_ResourceRoles0_B630511F (HelloHitCounter/HitCounterHandler/ServiceRole/DefaultPolicy/ResourceRoles0) will be updated in-place
+                ~ resource "aws_iam_role_policy" "HelloHitCounter_HitCounterHandler_ServiceRole_DefaultPolicy_ResourceRoles0_B630511F" {
+                      id          = "cdk-workshop-dev-cdrHandlerServiceRole20250715042121401600000001:cdkworkshopHelloHitCounterHitCounterHandlerServiceRoleDefaultPolicy688F79E1"
+                      name        = "cdkworkshopHelloHitCounterHitCounterHandlerServiceRoleDefaultPolicy688F79E1"
+                    ~ policy      = jsonencode(
+                        ~ {
+                            ~ Statement = [
+                                  # (1 unchanged element hidden)
+                                  {
+                                      Action   = [
+                                          "dynamodb:UpdateItem",
+                                          "dynamodb:Scan",
+                                          "dynamodb:Query",
+                                          "dynamodb:PutItem",
+                                          "dynamodb:GetShardIterator",
+                                          "dynamodb:GetRecords",
+                                          "dynamodb:GetItem",
+                                          "dynamodb:DescribeTable",
+                                          "dynamodb:DeleteItem",
+                                          "dynamodb:ConditionCheckItem",
+                                          "dynamodb:BatchWriteItem",
+                                          "dynamodb:BatchGetItem",
+                                      ]
+                                      Effect   = "Allow"
+                                      Resource = "arn:aws:dynamodb:us-east-1:694710432912:table/cdkworkshopHelloHitCounterHitsF0859462"
+                                  },
+                                + {
+                                    + Action   = "lambda:InvokeFunction"
+                                    + Effect   = "Allow"
+                                    + Resource = [
+                                        + "arn:aws:lambda:us-east-1:694710432912:function:cdk-workshop-dev-cdorkshopHelloHandler",
+                                        + "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:694710432912:function:cdk-workshop-dev-cdorkshopHelloHandler:$LATEST/invocations",
+                                      ]
+                                  },
+                              ]
+                              # (1 unchanged attribute hidden)
+                          }
+                      )
+                      # (2 unchanged attributes hidden)
+                  }
+
+              Plan: 0 to add, 1 to change, 0 to destroy.
 ```
+<!-- TODO: why does it include arn:aws:apigateway:us-east-1:lambda resource?? -->
 
 Which is exactly what we wanted.
 
@@ -198,7 +235,7 @@ Which is exactly what we wanted.
 Okay... let's give this another shot:
 
 ```
-cdk deploy
+cdktf deploy
 ```
 
 Then hit your endpoint with `curl` or with your web browser:

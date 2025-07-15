@@ -117,10 +117,10 @@ cdk-workshop    # aws_api_gateway_account.Endpoint_Account_B8304247 (Endpoint/Ac
 
 cdk-workshop  Changes to Outputs:
                 + EndpointOutputs = {
-                    + restApiId             = "1wtlltjta4"
+                    + restApiId             = "xxxxxxxxxx"
                     + restApiName           = "cdkworkshopEndpoint424A4D39"
-                    + restApiRootResourceId = "2yujx46z9g"
-                    + url                   = "https://1wtlltjta4.execute-api.us-east-1.amazonaws.com/prod/"
+                    + restApiRootResourceId = "yyyyyyyy"
+                    + url                   = "https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/prod/"
                   }
 
 ```
@@ -142,10 +142,10 @@ When deployment is complete, you'll notice this line:
 ```
 cdk-workshop
   EndpointOutputs = {
-    "restApiId": "1wtlltjta4",
+    "restApiId": "xxxxxxxxxx",
     "restApiName": "cdkworkshopEndpoint424A4D39",
-    "restApiRootResourceId": "2yujx46z9g",
-    "url": "https://1wtlltjta4.execute-api.us-east-1.amazonaws.com/prod/"
+    "restApiRootResourceId": "yyyyyyyy",
+    "url": "https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/prod/"
   }
 ```
 

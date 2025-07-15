@@ -8,37 +8,40 @@ weight = 300
 Now, let's define the AWS Lambda function and the DynamoDB table in our
 `HitCounter` construct. Go back to `lib/hitcounter.ts` and add the following highlighted code:
 
-{{<highlight ts "hl_lines=3 13-14 19-31">}}
-import * as cdk from 'aws-cdk-lib';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import { Construct } from 'constructs';
+{{<highlight ts "hl_lines=3-4 6 16-17 22-34">}}
+import { Construct } from "constructs";
+import {
+  Code,
+  LambdaFunction,
+  IFunction,
+  Runtime,
+} from "terraconstructs/lib/aws/compute";
+import { AttributeType, Table } from "terraconstructs/lib/aws/storage";
 
 export interface HitCounterProps {
   /** the function for which we want to count url hits **/
-  downstream: lambda.IFunction;
+  downstream: IFunction;
 }
 
 export class HitCounter extends Construct {
-
   /** allows accessing the counter function */
-  public readonly handler: lambda.Function;
+  public readonly handler: LambdaFunction;
 
   constructor(scope: Construct, id: string, props: HitCounterProps) {
     super(scope, id);
 
-    const table = new dynamodb.Table(this, 'Hits', {
-        partitionKey: { name: 'path', type: dynamodb.AttributeType.STRING }
+    const table = new Table(this, "Hits", {
+      partitionKey: { name: "path", type: AttributeType.STRING },
     });
 
-    this.handler = new lambda.Function(this, 'HitCounterHandler', {
-        runtime: lambda.Runtime.NODEJS_14_X,
-        handler: 'hitcounter.handler',
-        code: lambda.Code.fromAsset('lambda'),
-        environment: {
-            DOWNSTREAM_FUNCTION_NAME: props.downstream.functionName,
-            HITS_TABLE_NAME: table.tableName
-        }
+    this.handler = new LambdaFunction(this, "HitCounterHandler", {
+      runtime: Runtime.NODEJS_22_X,
+      handler: "hitcounter.handler",
+      code: Code.fromAsset("lambda"),
+      environment: {
+        DOWNSTREAM_FUNCTION_NAME: props.downstream.functionName,
+        HITS_TABLE_NAME: table.tableName,
+      },
     });
   }
 }

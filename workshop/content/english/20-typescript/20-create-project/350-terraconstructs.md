@@ -17,9 +17,9 @@ Now, Replace the `TerraformStack` from `cdktf` with TerraConstruct's `AwsStack`.
 
 This requires us to provide additional metadata such as:
 
-- `environmentName`: A user friendly description of the environment we are deploying into.
-- `gridUUID`: A Unique Identity that is decoupled from environment name or product/component identity.
-- `providerConfig`: The AWS configuration such as `region`.
+- **environmentName**: A user friendly description of the environment we are deploying into.
+- **gridUUID**: A Unique Identity that is decoupled from environment name or product/component identity.
+- **providerConfig**: AWS configuration such as `region`.
 
 {{<highlight ts "hl_lines=1 3 5-7 14-20">}}
 import { App } from "cdktf";

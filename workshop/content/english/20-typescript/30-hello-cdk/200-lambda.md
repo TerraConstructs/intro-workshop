@@ -7,8 +7,7 @@ weight = 200
 
 We'll start with the Terraconstructs Lambda handler code.
 
-1. Create a directory `lambda` in the root of your project tree (next to `bin`
-   and `lib`).
+1. Create a directory `lambda` in the root of your project tree (next to `main.ts`).
 2. TS CDKTF projects created with `cdktf init` ignore all `.js` files by default.
    To track these files with git, add `!lambda/*.js` to your `.gitignore` file.
    This ensures that your Lambda assets are properly checked into source control.
@@ -26,8 +25,8 @@ exports.handler = async function(event) {
 };
 ```
 
-This is a simple Lambda function which returns the text __"Hello, CDKTF! You've
-hit [url path]"__. The function's output also includes the HTTP status code and
+This is a simple Lambda function which returns the text *"Hello, CDKTF! You've
+hit [url path]"*. The function's output also includes the HTTP status code and
 HTTP headers. These are used by API Gateway to formulate the HTTP response to
 the user.
 
@@ -40,7 +39,7 @@ Lambda documentation [here](https://docs.aws.amazon.com/lambda/latest/dg/welcome
 
 The TerraConstructs library is an extensive library of constructs. The construct library
 is divided into __modules__, one for each Cloud and Service type it supports. For example,
-if you want to define an AWS Lambda function, we will need to use the AWS Compute construct library.
+if you want to define an AWS Lambda function, we will need to use the `aws/compute` module.
 
 <!--
 TODO: publish API Reference ..
