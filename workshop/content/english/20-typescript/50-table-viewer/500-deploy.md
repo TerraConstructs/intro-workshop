@@ -3,29 +3,105 @@ title = "Deploying our app"
 weight = 500
 +++
 
-## cdk diff
+## cdktf diff
 
 Before we deploy, let's take a look at what will happen when we deploy our app
 (this is just the `Resources` section of the output):
 
 ```
-$ cdk diff
-Resources
-[+] AWS::IAM::Role ViewHitCounter/Rendered/ServiceRole ViewHitCounterRenderedServiceRole254DB4EA
-[+] AWS::IAM::Policy ViewHitCounter/Rendered/ServiceRole/DefaultPolicy ViewHitCounterRenderedServiceRoleDefaultPolicy9ADB8C83
-[+] AWS::Lambda::Function ViewHitCounter/Rendered ViewHitCounterRendered9C783E45
-[+] AWS::Lambda::Permission ViewHitCounter/Rendered/ApiPermission.ANY.. ViewHitCounterRenderedApiPermissionANY72263B1A
-[+] AWS::Lambda::Permission ViewHitCounter/Rendered/ApiPermission.Test.ANY.. ViewHitCounterRenderedApiPermissionTestANYA4794B81
-[+] AWS::Lambda::Permission ViewHitCounter/Rendered/ApiPermission.ANY..{proxy+} ViewHitCounterRenderedApiPermissionANYproxy42B9E676
-[+] AWS::Lambda::Permission ViewHitCounter/Rendered/ApiPermission.Test.ANY..{proxy+} ViewHitCounterRenderedApiPermissionTestANYproxy104CA88E
-[+] AWS::ApiGateway::RestApi ViewHitCounter/ViewerEndpoint ViewHitCounterViewerEndpoint5A0EF326
-[+] AWS::ApiGateway::Deployment ViewHitCounter/ViewerEndpoint/Deployment ViewHitCounterViewerEndpointDeployment1CE7C5768689ca8f54dfa4f161d3df0ebffcdcff
-[+] AWS::ApiGateway::Stage ViewHitCounter/ViewerEndpoint/DeploymentStage.prod ViewHitCounterViewerEndpointDeploymentStageprodF3901FC7
-[+] AWS::IAM::Role ViewHitCounter/ViewerEndpoint/CloudWatchRole ViewHitCounterViewerEndpointCloudWatchRole87B94D6A
-[+] AWS::ApiGateway::Account ViewHitCounter/ViewerEndpoint/Account ViewHitCounterViewerEndpointAccount0B75E76A
-[+] AWS::ApiGateway::Resource ViewHitCounter/ViewerEndpoint/{proxy+} ViewHitCounterViewerEndpointproxy2F4C239F
-[+] AWS::ApiGateway::Method ViewHitCounter/ViewerEndpoint/{proxy+}/ANY ViewHitCounterViewerEndpointproxyANYFF4B8F5B
-[+] AWS::ApiGateway::Method ViewHitCounter/ViewerEndpoint/ANY ViewHitCounterViewerEndpointANY66F2285B
+$ cdktf diff
+cdk-workshop  Terraform used the selected providers to generate the following execution
+              plan. Resource actions are indicated with the following symbols:
+cdk-workshop  + create
+
+              Terraform will perform the following actions:
+
+                # aws_api_gateway_account.ViewHitCounter_ViewerEndpoint_Account_0B75E76A (ViewHitCounter/ViewerEndpoint/Account) will be created
+                + resource "aws_api_gateway_account" "ViewHitCounter_ViewerEndpoint_Account_0B75E76A" {
+                    + api_key_version     = (known after apply)
+                    + cloudwatch_role_arn = (known after apply)
+                    + features            = (known after apply)
+                    + id                  = (known after apply)
+                    + throttle_settings   = (known after apply)
+                  }
+
+                # aws_api_gateway_deployment.ViewHitCounter_ViewerEndpoint_Deployment_1CE7C576 (ViewHitCounter/ViewerEndpoint/Deployment/Resource) will be created
+                + resource "aws_api_gateway_deployment" "ViewHitCounter_ViewerEndpoint_Deployment_1CE7C576" {
+                    + created_date  = (known after apply)
+                    + description   = "Automatically created by the RestApi construct"
+                    + execution_arn = (known after apply)
+                    + id            = (known after apply)
+                    + invoke_url    = (known after apply)
+                    + rest_api_id   = (known after apply)
+                    + triggers      = {
+                        + "redeployment" = "2c0a96431a490394e62f6aa1253fcd32"
+                      }
+                  }
+
+                # aws_api_gateway_integration.ViewHitCounter_ViewerEndpoint_ANY_Integration_0D82D209 (ViewHitCounter/ViewerEndpoint/Default/ANY/Integration) will be created
+                + resource "aws_api_gateway_integration" "ViewHitCounter_ViewerEndpoint_ANY_Integration_0D82D209" {
+                    + cache_namespace         = (known after apply)
+                    + connection_type         = "INTERNET"
+                    + http_method             = "ANY"
+                    + id                      = (known after apply)
+                    + integration_http_method = "POST"
+                    + passthrough_behavior    = (known after apply)
+                    + resource_id             = (known after apply)
+                    + rest_api_id             = (known after apply)
+                    + timeout_milliseconds    = 29000
+                    + type                    = "AWS_PROXY"
+                    + uri                     = (known after apply)
+                  }
+
+                  ...
+                  # aws_lambda_permission.ViewHitCounter_ViewerEndpoint_proxy_ANY_ApiPermissionTestcdk-workshopViewHitCounterViewerEndpoint39EB6BA3ANYproxy_5F5DA8F5 (ViewHitCounter/ViewerEndpoint/Default/{proxy+}/ANY/ApiPermission.Test.cdk-workshopViewHitCounterViewerEndpoint39EB6BA3.ANY..{proxy+}) will be created
+                + resource "aws_lambda_permission" "ViewHitCounter_ViewerEndpoint_proxy_ANY_ApiPermissionTestcdk-workshopViewHitCounterViewerEndpoint39EB6BA3ANYproxy_5F5DA8F5" {
+                    + action              = "lambda:InvokeFunction"
+                    + function_name       = (known after apply)
+                    + id                  = (known after apply)
+                    + principal           = "apigateway.amazonaws.com"
+                    + source_arn          = (known after apply)
+                    + statement_id        = (known after apply)
+                    + statement_id_prefix = (known after apply)
+                  }
+
+                # aws_lambda_permission.ViewHitCounter_ViewerEndpoint_proxy_ANY_ApiPermissioncdk-workshopViewHitCounterViewerEndpoint39EB6BA3ANYproxy_D511D77E (ViewHitCounter/ViewerEndpoint/Default/{proxy+}/ANY/ApiPermission.cdk-workshopViewHitCounterViewerEndpoint39EB6BA3.ANY..{proxy+}) will be created
+                + resource "aws_lambda_permission" "ViewHitCounter_ViewerEndpoint_proxy_ANY_ApiPermissioncdk-workshopViewHitCounterViewerEndpoint39EB6BA3ANYproxy_D511D77E" {
+                    + action              = "lambda:InvokeFunction"
+                    + function_name       = (known after apply)
+                    + id                  = (known after apply)
+                    + principal           = "apigateway.amazonaws.com"
+                    + source_arn          = (known after apply)
+                    + statement_id        = (known after apply)
+                    + statement_id_prefix = (known after apply)
+                  }
+
+                # aws_s3_object.FileAsset_0_S3 (FileAsset_0_S3) will be created
+                + resource "aws_s3_object" "FileAsset_0_S3" {
+                    + acl                    = (known after apply)
+                    + arn                    = (known after apply)
+                    + bucket                 = "cdk-workshop-dev-694710432912-us-east-1"
+                    + bucket_key_enabled     = (known after apply)
+                    + checksum_crc32         = (known after apply)
+                    + checksum_crc32c        = (known after apply)
+                    + checksum_crc64nvme     = (known after apply)
+                    + checksum_sha1          = (known after apply)
+                    + checksum_sha256        = (known after apply)
+                    + content_type           = (known after apply)
+                    + etag                   = (known after apply)
+                    + force_destroy          = false
+                    + id                     = (known after apply)
+                    + key                    = "d9cdd7bdd784d6248d9a68dc7b1e49029a879f67840bd9cd5a3fd41de8b64c15.zip"
+                    + kms_key_id             = (known after apply)
+                    + server_side_encryption = (known after apply)
+                    + source                 = "assets/FileAsset_0/d9cdd7bdd784d6248d9a68dc7b1e49029a879f67840bd9cd5a3fd41de8b64c15/archive.zip"
+                    + source_hash            = "d9cdd7bdd784d6248d9a68dc7b1e49029a879f67840bd9cd5a3fd41de8b64c15"
+                    + storage_class          = (known after apply)
+                    + tags_all               = (known after apply)
+                    + version_id             = (known after apply)
+                  }
+
+              Plan: 19 to add, 0 to change, 0 to destroy.
 ```
 
 You'll notice that the table viewer adds another API Gateway endpoint, a Lambda
@@ -41,12 +117,24 @@ responsibility to understand how certain constructs that you use impact your
 application, and to make sure you only use construct libraries from vendors you
 trust  {{% /notice %}}
 
-### cdk deploy
+### cdktf deploy
 
 ```
-$ cdk deploy
+$ cdktf deploy --skip-synth
 ...
-CdkWorkshopStack.ViewHitCounterViewerEndpointCA1B1E4B = https://xxxxxxxxx.execute-api.us-east-1.amazonaws.com/prod/
+
+cdk-workshop  EndpointOutputs = {
+                "restApiId" = "xxxxxxxxx"
+                "restApiName" = "cdkworkshopEndpoint424A4D39"
+                "restApiRootResourceId" = "aaaaaaaaa"
+                "url" = "https://xxxxxxxxx.execute-api.us-east-1.amazonaws.com/prod/"
+              }
+              ViewerEndpointOutputs = {
+                "restApiId" = "yyyyyyyyy"
+                "restApiName" = "cdkworkshopViewHitCounterViewerEndpoint39EB6BA3"
+                "restApiRootResourceId" = "bbbbbbbbb"
+                "url" = "https://yyyyyyyyy.execute-api.us-east-1.amazonaws.com/prod/"
+              }
 ```
 
 You'll see the viewer endpoint as an output.

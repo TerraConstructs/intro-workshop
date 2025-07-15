@@ -5,45 +5,46 @@ weight = 400
 
 ## Add a table property to our hit counter
 
-Edit `hitcounter.ts` and modify it as such `table` is exposed as a public property.
+Edit `lib/hitcounter.ts` and modify it as such `table` is exposed as a public property.
 
-{{<highlight ts "hl_lines=15-16 27">}}
-import * as cdk from 'aws-cdk-lib';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import { Construct } from 'constructs';
+{{<highlight ts "hl_lines=19-20 28">}}
+import { Construct } from "constructs";
+import {
+  Code,
+  LambdaFunction,
+  IFunction,
+  Runtime,
+} from "terraconstructs/lib/aws/compute";
+import { AttributeType, Table } from "terraconstructs/lib/aws/storage";
 
 export interface HitCounterProps {
   /** the function for which we want to count url hits **/
-  downstream: lambda.IFunction;
+  downstream: IFunction;
 }
 
 export class HitCounter extends Construct {
   /** allows accessing the counter function */
-  public readonly handler: lambda.Function;
+  public readonly handler: LambdaFunction;
 
   /** the hit counter table */
-  public readonly table: dynamodb.Table;
+  public readonly table: Table;
 
   constructor(scope: Construct, id: string, props: HitCounterProps) {
     super(scope, id);
 
-    const table = new dynamodb.Table(this, "Hits", {
-      partitionKey: {
-        name: "path",
-        type: dynamodb.AttributeType.STRING
-      }
+    const table = new Table(this, "Hits", {
+      partitionKey: { name: "path", type: AttributeType.STRING },
     });
     this.table = table;
 
-    this.handler = new lambda.Function(this, 'HitCounterHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'hitcounter.handler',
-      code: lambda.Code.fromAsset('lambda'),
+    this.handler = new LambdaFunction(this, "HitCounterHandler", {
+      runtime: Runtime.NODEJS_22_X,
+      handler: "hitcounter.handler",
+      code: Code.fromAsset("lambda"),
       environment: {
         DOWNSTREAM_FUNCTION_NAME: props.downstream.functionName,
-        HITS_TABLE_NAME: table.tableName
-      }
+        HITS_TABLE_NAME: table.tableName,
+      },
     });
 
     // grant the lambda role read/write permissions to our table
@@ -57,40 +58,58 @@ export class HitCounter extends Construct {
 
 ## Now we can access the table from our stack
 
-Go back to `cdk-workshop-stack.ts` and assign the `table` property of the table viewer:
+Go back to `main.ts` and assign the `table` property of the table viewer:
 
-{{<highlight ts "hl_lines=28">}}
-import * as cdk from 'aws-cdk-lib';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as apigw from 'aws-cdk-lib/aws-apigateway';
-import { HitCounter } from './hitcounter';
-import { TableViewer } from 'cdk-dynamo-table-viewer';
+{{<highlight ts "hl_lines=37">}}import { TableViewer } from "@tcons/cdk-dynamo-table-viewer";
+import { App } from "cdktf";
+import { Construct } from "constructs";
+import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
+import {
+  Code,
+  LambdaFunction,
+  Runtime,
+  LambdaRestApi,
+} from "terraconstructs/lib/aws/compute";
+import { HitCounter } from "./lib/hitcounter";
 
-export class CdkWorkshopStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+class MyStack extends AwsStack {
+  constructor(scope: Construct, id: string, props: AwsStackProps) {
     super(scope, id, props);
 
-    const hello = new lambda.Function(this, 'HelloHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      code: lambda.Code.fromAsset('lambda'),
-      handler: 'hello.handler'
+    // defines an AWS Lambda resource
+    const hello = new LambdaFunction(this, "HelloHandler", {
+      // functionNamePrefix: "your-hello-handler",
+      runtime: Runtime.NODEJS_22_X,
+      code: Code.fromAsset("lambda"),
+      handler: "hello.handler",
     });
 
-    const helloWithCounter = new HitCounter(this, 'HelloHitCounter', {
-      downstream: hello
+    const helloWithCounter = new HitCounter(this, "HelloHitCounter", {
+      downstream: hello,
     });
 
     // defines an API Gateway REST API resource backed by our "hello" function.
-    new apigw.LambdaRestApi(this, 'Endpoint', {
-      handler: helloWithCounter.handler
+    new LambdaRestApi(this, "Endpoint", {
+      handler: helloWithCounter.handler,
+      registerOutputs: true,
     });
 
-    new TableViewer(this, 'ViewHitCounter', {
-      title: 'Hello Hits',
-      table: helloWithCounter.table
+    new TableViewer(this, "ViewHitCounter", {
+      title: "Hello Hits",
+      table: helloWithCounter.table,
     });
   }
 }
+
+const app = new App();
+new MyStack(app, "cdk-workshop", {
+  environmentName: "dev",
+  gridUUID: "cdk-workshop-dev",
+  providerConfig: {
+    region: "us-east-1",
+  },
+});
+app.synth();
 {{</highlight>}}
 
 We're finished making code changes,

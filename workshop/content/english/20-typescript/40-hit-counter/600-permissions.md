@@ -253,8 +253,11 @@ HTTP/2 200 OK
 Hello, CDK! You've hit /
 ```
 
-> If you still get 5xx, give it a few seconds and try again. Sometimes API
-Gateway takes a little bit to "flip" the endpoint to use the new deployment.
+{{% notice info %}}
+If you still get 5xx, give it a few seconds and try again. Sometimes IAM Policy changes
+take time to propagate or API Gateway takes a little bit to "flip" the endpoint to use
+the new deployment.
+{{% /notice %}}
 
 # 😲
 

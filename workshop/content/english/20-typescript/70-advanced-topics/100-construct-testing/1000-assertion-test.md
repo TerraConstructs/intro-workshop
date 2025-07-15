@@ -12,34 +12,65 @@ weight = 200
 Our `HitCounter` construct creates a simple DynamoDB table. Lets create a test that
 validates that the table is getting created.
 
-If `cdk init` created a test directory for you, then you should have a `cdk-workshop.test.ts` file. Delete this file.
+If `cdktf init` created a test directory for you, then you should have a `__tests__/main-test.ts` file. Delete this file.
 
-If you do not already have a `test` directory (usually created automatically when you run `cdk init`), then create a `test` directory at the
-same level as `bin` and `lib` and then create a file called `hitcounter.test.ts` with the following code.
+First, let's add `@cdktf/provider-aws` as a Dev dependency
 
+```
+npm install -D @cdktf/provider-aws@~20.1.0
+```
+
+If you do not already have a `__tests__` directory (usually created automatically when you
+run `cdktf init`), then create a `__tests__` directory at the same level as `main.ts`
+and then create a file called `hitcounter.test.ts` with the following code.
 
 ```typescript
-import { Template, Capture } from 'aws-cdk-lib/assertions';
-import * as cdk from 'aws-cdk-lib';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import { HitCounter }  from '../lib/hitcounter';
+/* eslint-disable import/no-extraneous-dependencies */
+import { DynamodbTable } from "@cdktf/provider-aws/lib/dynamodb-table";
+import { App, Testing } from "cdktf";
+import "cdktf/lib/testing/adapters/jest";
+import { AwsStack } from "terraconstructs/lib/aws/aws-stack";
+import { Code, LambdaFunction, Runtime } from "terraconstructs/lib/aws/compute";
+import { HitCounter } from "../lib/hitcounter";
 
-test('DynamoDB Table Created', () => {
-  const stack = new cdk.Stack();
-  // WHEN
-  new HitCounter(stack, 'MyTestConstruct', {
-    downstream:  new lambda.Function(stack, 'TestFunction', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'hello.handler',
-      code: lambda.Code.fromAsset('lambda')
-    })
+const defaultAwsStackProps = {
+  environmentName: "test",
+  gridUUID: "test-uuid",
+  providerConfig: { region: "us-east-1" },
+  gridBackendConfig: {
+    address: "http://localhost:3000",
+  },
+};
+
+describe("StackBase", () => {
+  let app: App;
+  let stack: AwsStack;
+
+  // Test set up.
+  beforeEach(() => {
+    app = Testing.app();
+    stack = new AwsStack(app, "test", defaultAwsStackProps);
   });
-  // THEN
 
-  const template = Template.fromStack(stack);
-  template.resourceCountIs("AWS::DynamoDB::Table", 1);
+  test("DynamoDB Table Created", () => {
+    // WHEN
+    new HitCounter(stack, "MyTestConstruct", {
+      downstream: new LambdaFunction(stack, "TestFunction", {
+        runtime: Runtime.NODEJS_20_X,
+        handler: "hello.handler",
+        code: Code.fromAsset("lambda"),
+      }),
+    });
+
+    // THEN
+    stack.prepareStack(); // required by terraconstructs
+    const template = Testing.synth(stack);
+    expect(template).toMatchSnapshot();
+    expect(template).toHaveResource(DynamodbTable);
+  });
 });
 ```
+
 This test is simply testing to ensure that the synthesized stack includes a DynamoDB table.
 
 Run the test.
