@@ -2,21 +2,19 @@
     "name": "cdkworkshop.com",
     "version": "0.1.0",
     "private": true,
-    "main": "bin/index.js",
-    "types": "bin/index.d.ts",
-    "bin": {
-        "cdkworkshop.com": "bin/cdkworkshop.com.js"
-    },
     "scripts": {
         "build": "tsc --build && (cd ../workshop && hugo)",
         "watch": "tsc --build -w",
-        "deploy": "npm run build && cdk deploy",
-        "cdk": "cdk"
+        "deploy": "npm run build && cdktf deploy",
+        "synth": "npm run build && npx cdktf synth"
     },
     "devDependencies": {
         "@biomejs/biome": "1.8.3",
         "@types/node": "^20.14.11",
-        "aws-cdk": "^2.149.0",
+        "cdktf": "^0.21.0",
+        "cdktf-cli": "^0.21.0",
+        "constructs": "^10.4.2",
+        "terraconstructs": "^0.1.0",
         "typescript": "^5.5.3"
     },
     "repository": {
@@ -24,8 +22,9 @@
         "type": "git"
     },
     "dependencies": {
-        "aws-cdk-lib": "^2.150.0",
-        "constructs": "^10.3.0"
+        "cdktf": "^0.21.0",
+        "constructs": "^10.4.2",
+        "terraconstructs": "^0.1.0"
     },
     "engines": {
         "node": ">= 20.0.0"

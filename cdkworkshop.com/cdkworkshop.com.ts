@@ -1,262 +1,198 @@
 #!/usr/bin/env node
 
-// NOTE: Before redirect
+import * as path from 'node:path';
+import { App, LocalBackend, TerraformOutput } from 'cdktf';
+import type { Construct } from 'constructs';
+import { Duration } from 'terraconstructs/lib';
+import { AwsStack, type AwsStackProps, edge, storage } from 'terraconstructs/lib/aws';
+// import { GuardDutyNotifier } from './guardduty';
+import { hashDirectorySync } from './hash';
+
+export interface CdkWorkshopProps extends AwsStackProps {
+    /**
+     * The ID of the DNS zone to use for the workshop domain
+     * (this should be created separately)
+     */
+    zoneId: string;
+
+    /**
+     * The Domain the workshop is hosted at
+     */
+    domain: string;
+
+    // /**
+    //  * Email address to use for AWS GuardDuty security finding notifications
+    //  */
+    // email: string;
+}
+
+// NOTE: Before AWS User Metrics
+// https://github.com/aws-samples/aws-cdk-intro-workshop/pull/763/files
+
+// NOTE: Before cdkworkshop.com redirect to aws-catalog
 // https://github.com/aws-samples/aws-cdk-intro-workshop/pull/1478/files?diff=unified&w=1#diff-037ad33a0965a87240f9aeb7d2efa871f2012bce547a01b5b3c703b3dc16c0f9
 
-// to be converted, similar to learn.terraconstructs.dev
-// https://github.com/TerraConstructs/learn/blob/main/infra/main.ts
+export class CdkWorkshop extends AwsStack {
+    constructor(scope: Construct, id: string, props: CdkWorkshopProps) {
+        super(scope, id, props);
+        const { domain, zoneId } = props;
 
-import {
-  aws_certificatemanager as acm,
-  aws_cloudfront as cloudfront,
-  aws_route53 as route53,
-  aws_route53_targets as route53Targets,
-  aws_s3 as s3,
-  aws_s3_deployment as s3deploy,
-  aws_cloudfront_origins as cloudfrontOrigins,
-  App,
-  CfnOutput,
-  Duration,
-  Fn,
-  Stack,
-  type StackProps,
-  Stage,
-} from 'aws-cdk-lib';
-import { GuardDutyNotifier } from './guardduty';
-import * as path from 'node:path';
-import { hashDirectorySync } from './hash';
-import { PipelineStack } from './pipeline';
-import type { Construct } from 'constructs';
+        // TODO: GuardDuty Support
+        // // Enable AWS GuardDuty in this account, and send any security findings via email
+        // new GuardDutyNotifier(this, 'GuardDuty', {
+        //     environmentName: props.domain,
+        //     email: props.email,
+        // });
 
-export interface CdkWorkshopProps extends StackProps {
-  /**
-   * The Domain the workshop should be hosted at
-   */
-  domain: string;
-
-  /**
-   * The ARN of the Amazon Certificate Manager (ACM) certificate to use with CloudFront
-   */
-  certificate: string;
-
-  /**
-   * Email address to use for AWS GuardDuty security finding notifications
-   */
-  email: string;
-
-  /**
-   * If true, AWS WAF will be deployed in front of the workshop CloudFront
-   * distribution, with a ruleset to only allow access from the Amazon corporate network
-   */
-  restrictToAmazonNetwork: boolean;
-
-  /**
-   * The ARN of the AWS WAF WebACL that restricts access to the Amazon corporate network (should be deployed separately)
-   */
-  restrictToAmazonNetworkWebACL: string;
-
-  /**
-   * The target for the redirect
-   */
-  redirectTarget: string;
-}
-
-export class CdkWorkshop extends Stack {
-  constructor(scope: Construct, id: string, props: CdkWorkshopProps) {
-    super(scope, id, props);
-
-    this.renameLogicalId('CloudFrontDNSRecord46217411', 'CloudFrontDNSRecord');
-
-    // Enable AWS GuardDuty in this account, and send any security findings via email
-    new GuardDutyNotifier(this, 'GuardDuty', {
-      environmentName: props.domain,
-      email: props.email,
-    });
-
-    // Create DNS Zone
-    const zone = new route53.PublicHostedZone(this, 'HostedZone', {
-      zoneName: props.domain,
-    });
-
-    // Bucket to hold the static website
-    const bucket = new s3.Bucket(this, 'Bucket', {});
-    const contentDir = path.join(__dirname, '..', 'workshop', 'public');
-    const contentHash = hashDirectorySync(contentDir);
-    new s3deploy.BucketDeployment(this, 'DeployWebsite', {
-      sources: [s3deploy.Source.asset(contentDir)],
-      destinationBucket: bucket,
-      destinationKeyPrefix: contentHash,
-      retainOnDelete: true,
-    });
-
-    // CloudFront Origin Access Identity
-    const originAccess = new cloudfront.OriginAccessIdentity(
-      this,
-      'BucketOrigin',
-      {
-        comment: props.domain,
-      },
-    );
-    (
-      originAccess.node
-        .defaultChild as cloudfront.CfnCloudFrontOriginAccessIdentity
-    ).overrideLogicalId('BucketOrigin');
-    let acl: string | undefined;
-    if (props.restrictToAmazonNetwork) {
-      acl = props.restrictToAmazonNetworkWebACL.toString();
-    }
-    const indexHandlerFunc = new cloudfront.Function(this, 'IndexHandler', {
-      runtime: cloudfront.FunctionRuntime.JS_2_0,
-      code: cloudfront.FunctionCode.fromInline(`
-        function handler(event) {
-          const request = event.request;
-          const newUri = '${props.redirectTarget}';
-          return {
-            statusCode: 301,
-            statusDescription: 'Permanent Redirect',
-            headers: { location: { value: newUri } },
-          };
-        }
-      `),
-    });
-
-    // CloudFront distribution
-    const cert = acm.Certificate.fromCertificateArn(
-      this,
-      'Certificate',
-      props.certificate,
-    );
-    const cdn = new cloudfront.Distribution(this, 'CloudFrontDistribution', {
-      defaultBehavior: {
-        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
-        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        origin: new cloudfrontOrigins.S3Origin(bucket, {
-          originAccessIdentity: originAccess,
-          originPath: `/${contentHash}`,
-        }),
-        responseHeadersPolicy: new cloudfront.ResponseHeadersPolicy(
-          this,
-          'ResponseHeadersPolicy',
-          {
-            securityHeadersBehavior: {
-              frameOptions: {
-                frameOption: cloudfront.HeadersFrameOption.DENY,
-                override: true,
-              },
-              contentTypeOptions: { override: true },
-              xssProtection: {
-                protection: true,
-                modeBlock: true,
-                override: true,
-              },
-              referrerPolicy: {
-                referrerPolicy:
-                  cloudfront.HeadersReferrerPolicy
-                    .STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
-                override: true,
-              },
-              strictTransportSecurity: {
-                accessControlMaxAge: Duration.seconds(31536000),
-                includeSubdomains: true,
-                override: true,
-              },
+        const zone = edge.DnsZone.fromZoneId(this, 'Zone', zoneId);
+        const certificate = new edge.PublicCertificate(this, 'Certificate', {
+            domainName: domain,
+            validation: {
+                method: edge.ValidationMethod.DNS,
+                hostedZone: zone,
             },
-          },
-        ),
-        functionAssociations: [
-          {
-            eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
-            function: indexHandlerFunc,
-          },
-        ],
-      },
-      webAclId: acl,
-      certificate: cert,
-      domainNames: [props.domain],
-    });
-    (cdn.node.defaultChild as cloudfront.CfnDistribution).overrideLogicalId(
-      'CloudFrontCFDistribution57EFBAC6',
-    );
+            lifecycle: {
+                createBeforeDestroy: true,
+            },
+        });
 
-    // DNS alias for the CloudFront distribution
-    new route53.ARecord(this, 'CloudFrontDNSRecord', {
-      recordName: `${props.domain}.`,
-      zone,
-      target: route53.RecordTarget.fromAlias(
-        new route53Targets.CloudFrontTarget(cdn),
-      ),
-    });
+        const contentDir = path.join(__dirname, '..', 'workshop', 'public');
+        const contentHash = hashDirectorySync(contentDir);
+        // Bucket to hold the static website
+        const bucket = new storage.Bucket(this, 'Bucket', {
+            cloudfrontAccess: {
+                enabled: true,
+                keyPatterns: ['*', `${contentHash}/*`],
+            },
+        });
+        bucket.addSource({
+            path: contentDir,
+            prefix: contentHash,
+        });
 
-    // Email security records
-    const emailRecordComment =
-      'This record restricts email functionality to help prevent spoofing and impersonation events.';
-    new route53.TxtRecord(this, 'EmailSpfRecord', {
-      zone,
-      values: ['v=spf1 -all'],
-      comment: emailRecordComment,
-    });
-    new route53.TxtRecord(this, 'EmailDkimRecord', {
-      recordName: '*._domainkey',
-      zone,
-      values: ['v=DKIM1; p='],
-      comment: emailRecordComment,
-    });
-    new route53.TxtRecord(this, 'EmailDmarcRecord', {
-      recordName: '_dmarc',
-      zone,
-      values: [
-        'v=DMARC1; p=reject; rua=mailto:report@dmarc.amazon.com; ruf=mailto:report@dmarc.amazon.com',
-      ],
-      comment: emailRecordComment,
-    });
+        const indexHandlerFunc = new edge.Function(this, 'IndexHandler', {
+            nameSuffix: 'IndexHandler',
+            runtime: edge.FunctionRuntime.JS_2_0,
+            // ref: https://github.com/aws-samples/aws-cdk-intro-workshop/blob/8f120cd2a1ec71f4cca4cb027f323fd543b2121e/cdkworkshop.com/indexhandler/index.js
+            code: edge.FunctionCode.fromFile({
+                filePath: path.join(__dirname, 'indexhandler', 'index.js'),
+            }),
+        });
 
-    // Configure Outputs
-    new CfnOutput(this, 'URL', {
-      description: 'The URL of the workshop',
-      value: `https://${props.domain}`,
-    });
-    new CfnOutput(this, 'CloudFrontURL', {
-      description: 'The CloudFront distribution URL',
-      value: `https://${cdn.distributionDomainName}`,
-    });
-    new CfnOutput(this, 'CertificateArn', {
-      description: 'The SSL certificate ARN',
-      value: props.certificate,
-    });
-    if (zone.hostedZoneNameServers) {
-      new CfnOutput(this, 'Nameservers', {
-        description: 'Nameservers for DNS zone',
-        value: Fn.join(', ', zone.hostedZoneNameServers),
-      });
+        const cspPolicyContent = [
+            `default-src 'self' https://${props.domain}`,
+            "style-src 'self' 'sha256-biLFinpqYMtWHmXfkA1BPeCY0/fNt46SAZ+BBk5YUog=' fonts.googleapis.com",
+            "font-src 'self' fonts.gstatic.com",
+            // "script-src 'self' www.google-analytics.com",
+        ].join('; ');
+
+        // CloudFront distribution
+        const cdn = new edge.Distribution(this, 'CloudFrontDistribution', {
+            defaultBehavior: {
+                allowedMethods: edge.AllowedMethods.ALLOW_GET_HEAD,
+                viewerProtocolPolicy: edge.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                origin: new edge.S3Origin(bucket, {
+                    originPath: `/${contentHash}`,
+                }),
+                responseHeadersPolicy: new edge.ResponseHeadersPolicy(this, 'ResponseHeadersPolicy', {
+                    securityHeadersBehavior: {
+                        frameOptions: {
+                            frameOption: edge.HeadersFrameOption.DENY,
+                            override: true,
+                        },
+                        contentTypeOptions: { override: true },
+                        xssProtection: {
+                            protection: true,
+                            modeBlock: true,
+                            override: true,
+                        },
+                        referrerPolicy: {
+                            referrerPolicy: edge.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
+                            override: true,
+                        },
+                        contentSecurityPolicy: {
+                            override: true,
+                            contentSecurityPolicy: cspPolicyContent,
+                        },
+                        strictTransportSecurity: {
+                            accessControlMaxAge: Duration.seconds(31536000),
+                            includeSubdomains: true,
+                            override: true,
+                        },
+                    },
+                }),
+                // Rewrite "some/" as "some/index.html"
+                functionAssociations: [
+                    {
+                        // TODO: BUG! Function association is not working?
+                        eventType: edge.FunctionEventType.VIEWER_REQUEST,
+                        function: indexHandlerFunc,
+                    },
+                ],
+            },
+            certificate,
+            aliases: [props.domain],
+        });
+        // DNS alias for the CloudFront distribution
+        new edge.ARecord(this, 'CloudFrontDNSRecord', {
+            recordName: `${props.domain}.`,
+            zone,
+            target: edge.RecordTarget.fromAlias(new edge.DistributionTarget(cdn)),
+        });
+
+        // // Email security records
+        // const emailRecordComment =
+        //     'This record restricts email functionality to help prevent spoofing and impersonation events.';
+        // new edge.TxtRecord(this, 'EmailSpfRecord', {
+        //     zone,
+        //     values: ['v=spf1 -all'],
+        //     comment: emailRecordComment,
+        // });
+        // new edge.TxtRecord(this, 'EmailDkimRecord', {
+        //     recordName: '*._domainkey',
+        //     zone,
+        //     values: ['v=DKIM1; p='],
+        //     comment: emailRecordComment,
+        // });
+        // new edge.TxtRecord(this, 'EmailDmarcRecord', {
+        //     recordName: '_dmarc',
+        //     zone,
+        //     values: ['v=DMARC1; p=reject; rua=mailto:report@dmarc.amazon.com; ruf=mailto:report@dmarc.amazon.com'],
+        //     comment: emailRecordComment,
+        // });
+
+        // Configure Outputs
+        new TerraformOutput(this, 'URL', {
+            description: 'The URL of the workshop',
+            value: `https://${props.domain}`,
+        });
+        new TerraformOutput(this, 'CloudFrontURL', {
+            description: 'The CloudFront distribution URL',
+            value: `https://${cdn.domainName}`,
+        });
+        new TerraformOutput(this, 'CertificateArn', {
+            description: 'The SSL certificate ARN',
+            value: certificate.certificateArn,
+        });
     }
-  }
 }
 
-const ENV = { account: '025656461920', region: 'eu-west-1' };
+const outdir = 'cdktf.out';
+const stackName = 'Workshop';
+const app = new App({
+    outdir,
+});
+const stack = new CdkWorkshop(app, stackName, {
+    gridUUID: 'website',
+    environmentName: 'prod',
+    providerConfig: {
+        region: 'us-east-1',
+    },
+    zoneId: 'Z09339061DF0IQA1CJMKQ', // terraconstructs.dev zone
+    domain: 'aws-workshop.terraconstructs.dev',
+});
 
-export class TheCdkWorkshopStage extends Stage {
-  constructor(scope: Construct, id: string) {
-    super(scope, id, { env: ENV });
-
-    new CdkWorkshop(this, 'CloudFrontStack', {
-      stackName: 'CDK-WORKSHOP-PROD',
-      domain: 'cdkworkshop.com',
-      certificate:
-        'arn:aws:acm:us-east-1:025656461920:certificate/c75d7a9d-1253-4506-bc6d-5874767b3c35',
-      email: 'aws-cdk-workshop@amazon.com',
-      restrictToAmazonNetwork: false,
-      restrictToAmazonNetworkWebACL: Fn.importValue(
-        'AMAZON-CORP-NETWORK-ACL:AmazonNetworkACL',
-      ),
-      redirectTarget:
-        'https://catalog.us-east-1.prod.workshops.aws/workshops/10141411-0192-4021-afa8-2436f3c66bd8/en-US',
-    });
-  }
-}
-
-const app = new App();
-new PipelineStack(app, 'WorkshopPipelineStack', {
-  env: ENV,
-  terminationProtection: true,
+new LocalBackend(stack, {
+    path: `${stackName}.tfstate`,
 });
 app.synth();

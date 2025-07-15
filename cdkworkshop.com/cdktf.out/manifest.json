@@ -1,0 +1,16 @@
+{
+  "stacks": {
+    "Workshop": {
+      "annotations": [
+      ],
+      "constructPath": "Workshop",
+      "dependencies": [
+      ],
+      "name": "Workshop",
+      "stackMetadataPath": "stacks/Workshop/metadata.json",
+      "synthesizedStackPath": "stacks/Workshop/cdk.tf.json",
+      "workingDirectory": "stacks/Workshop"
+    }
+  },
+  "version": "0.21.0"
+}

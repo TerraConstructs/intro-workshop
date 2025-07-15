@@ -1,6 +1,0 @@
-{
-    "app": "node ./cdkworkshop.com.js",
-    "context": {
-        "@aws-cdk/core:newStyleStackSynthesis": true
-    }
-}

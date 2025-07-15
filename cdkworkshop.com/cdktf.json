@@ -1,0 +1,12 @@
+{
+  "language": "typescript",
+  "app": "node ./cdkworkshop.com.js",
+  "terraformProviders": [],
+  "terraformModules": [],
+  "context": {},
+  "watchPattern": [
+    "indexhandler/*.js",
+    "./**/*.ts"
+  ],
+  "projectId": "26a0bb78-7280-4530-91ab-4238d7624c64"
+}

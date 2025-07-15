@@ -12,3 +12,8 @@ workshop/.hugo_build.lock
 obj/
 cdk.out/
 *~
+tsconfig.tsbuildinfo
+
+*terraform.*.tfstate*
+.gen
+.terraform

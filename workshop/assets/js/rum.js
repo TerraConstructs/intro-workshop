@@ -1,4 +1,4 @@
-document.onreadystatechange = function () {
+/*document.onreadystatechange = function () {
   if (document.readyState === "interactive") {
     new CookiesEuBanner(function () {
       console.log("Tracking accepted.");
@@ -17,7 +17,8 @@ document.onreadystatechange = function () {
           allowCookies: true,
           enableXRay: false
         }
-      );    
+      );
     }, true);
   }
 };
+*/
