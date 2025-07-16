@@ -37,7 +37,6 @@ stack.
 By the end of this workshop, you'll be able to:
 
 - Create new CDKTF applications.
-- Create new CDKTF applications.
 - Define your app's infrastructure using the TerraConstructs library
 - Deploy your CDKTF apps to your AWS account
 - Define your own reusable constructs
