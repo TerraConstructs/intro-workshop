@@ -219,10 +219,14 @@ Now you're all set to start watching!
 
 ## Running `cdktf watch`
 
-First, call `cdktf watch --auto-approve`:
+First, call `cdktf watch`:
+
+{{% notice danger %}} 
+Due to its potential destructive behaviour, you have to explicitely set the `--auto-approve` flag.
+{{% /notice %}}
 
 ```
-cdk watch
+cdktf watch --auto-approve
 ```
 
 This will trigger an initial deployment and immediately begin observing the files

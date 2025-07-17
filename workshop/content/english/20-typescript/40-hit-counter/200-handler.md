@@ -10,9 +10,10 @@ Okay, now let's write the Lambda handler code for our hit counter.
 Create the file `lambda/hitcounter.js`:
 
 ```js
-const { DynamoDB, Lambda } = require('aws-sdk');
+const { DynamoDB } = require("@aws-sdk/client-dynamodb");
+const { Lambda, InvokeCommand } = require("@aws-sdk/client-lambda");
 
-exports.handler = async function(event) {
+exports.handler = async function (event) {
   console.log("request:", JSON.stringify(event, undefined, 2));
 
   // create AWS SDK clients
@@ -23,20 +24,23 @@ exports.handler = async function(event) {
   await dynamo.updateItem({
     TableName: process.env.HITS_TABLE_NAME,
     Key: { path: { S: event.path } },
-    UpdateExpression: 'ADD hits :incr',
-    ExpressionAttributeValues: { ':incr': { N: '1' } }
-  }).promise();
+    UpdateExpression: "ADD hits :incr",
+    ExpressionAttributeValues: { ":incr": { N: "1" } },
+  });
 
   // call downstream function and capture response
-  const resp = await lambda.invoke({
+  const command = new InvokeCommand({
     FunctionName: process.env.DOWNSTREAM_FUNCTION_NAME,
-    Payload: JSON.stringify(event)
-  }).promise();
+    Payload: JSON.stringify(event),
+  });
 
-  console.log('downstream response:', JSON.stringify(resp, undefined, 2));
+  const { Payload } = await lambda.send(command);
+  const result = Buffer.from(Payload).toString();
+
+  console.log("downstream response:", JSON.stringify(result, undefined, 2));
 
   // return response back to upstream caller
-  return JSON.parse(resp.Payload);
+  return JSON.parse(result);
 };
 ```
 

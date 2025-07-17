@@ -17,9 +17,15 @@ Now, Replace the `TerraformStack` from `cdktf` with TerraConstruct's `AwsStack`.
 
 This requires us to provide additional metadata such as:
 
-- **environmentName**: A user friendly description of the environment we are deploying into.
-- **gridUUID**: A Unique Identity that is decoupled from environment name or product/component identity.
 - **providerConfig**: AWS configuration such as `region`.
+- **gridUUID**: A Unique Identity that is decoupled from environment name or product/component identity.
+- **environmentName**: A user friendly description of the environment we are deploying into.
+
+{{% notice danger %}}
+Workshops ran on shared AWS Accounts must use unique `gridUUID` to avoid name conflicts for stack utilities such as s3 bucket.
+
+`gridUUID` must only consist of `[1-9a-z\-]` characters.
+{{% /notice %}}
 
 {{<highlight ts "hl_lines=1 3 5-7 14-20">}}
 import { App } from "cdktf";
@@ -69,46 +75,6 @@ class MyStack extends AwsStack {
     });
 
     const topic = new Topic(this, "CdkWorkshopTopic");
-    topic.addSubscription(new subscriptions.SqsSubscription(queue));
-  }
-}
-
-const app = new App();
-new MyStack(app, "cdk-workshop", {
-  environmentName: "dev",
-  gridUUID: "cdk-workshop-dev",
-  providerConfig: {
-    region: "us-east-1",
-  },
-});
-app.synth();
-{{</highlight>}}
-
-## Shared AWS Account
-
-{{% notice danger %}} Workshops ran on shared AWS Accounts require identifiers to avoid name conflicts{{% /notice %}}
-
-Use the `topicName` or `namePrefix` properties to make your resource identities unique:
-
-{{<highlight ts "hl_lines=12 16-18">}}
-import { App } from "cdktf";
-import { Construct } from "constructs";
-import { Duration } from "terraconstructs/lib";
-import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
-import { Queue, Topic, subscriptions } from "terraconstructs/lib/aws/notify";
-
-class MyStack extends AwsStack {
-  constructor(scope: Construct, id: string, props: AwsStackProps) {
-    super(scope, id, props);
-
-    const queue = new Queue(this, "CdkWorkshopQueue", {
-      namePrefix: "vincent",
-      visibilityTimeoutSeconds: Duration.seconds(300).toSeconds(),
-    });
-
-    const topic = new Topic(this, "CdkWorkshopTopic", {
-      topicName: "vincent-topic",
-    });
     topic.addSubscription(new subscriptions.SqsSubscription(queue));
   }
 }

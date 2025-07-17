@@ -17,6 +17,8 @@ will be returned back to the user.
 
 Going back to `main.ts`, let's define an API endpoint and associate it with our Lambda function:
 
+<!-- Terraconstructs BUG: CW Logs integration to AWS Account causes flip-flop -->
+
 {{<highlight ts "hl_lines=8 16 23-27">}}
 import { App } from "cdktf";
 import { Construct } from "constructs";
@@ -34,7 +36,6 @@ class MyStack extends AwsStack {
 
     // defines an AWS Lambda resource
     const hello = new LambdaFunction(this, "HelloHandler", {
-      // functionNamePrefix: "your-hello-handler",
       runtime: Runtime.NODEJS_22_X,
       code: Code.fromAsset("lambda"),
       handler: "hello.handler",
@@ -42,6 +43,7 @@ class MyStack extends AwsStack {
 
     // defines an API Gateway REST API resource backed by our "hello" function.
     new LambdaRestApi(this, "Endpoint", {
+      cloudWatchRole: false, // disable CW Logs for now
       handler: hello,
       registerOutputs: true,
     });
@@ -78,16 +80,7 @@ cdk-workshop  Terraform used the selected providers to generate the following ex
                 + create
 
               Terraform will perform the following actions:
-cdk-workshop    # aws_api_gateway_account.Endpoint_Account_B8304247 (Endpoint/Account) will be created
-                + resource "aws_api_gateway_account" "Endpoint_Account_B8304247" {
-                    + api_key_version     = (known after apply)
-                    + cloudwatch_role_arn = (known after apply)
-                    + features            = (known after apply)
-                    + id                  = (known after apply)
-                    + throttle_settings   = (known after apply)
-                  }
-
-                # aws_api_gateway_deployment.Endpoint_Deployment_318525DA (Endpoint/Deployment/Resource) will be created
+cdk-workshop    # aws_api_gateway_deployment.Endpoint_Deployment_318525DA (Endpoint/Deployment/Resource) will be created
                 + resource "aws_api_gateway_deployment" "Endpoint_Deployment_318525DA" {
                     + created_date  = (known after apply)
                     + description   = "Automatically created by the RestApi construct"
@@ -125,7 +118,7 @@ cdk-workshop  Changes to Outputs:
 
 ```
 
-That's nice. This one line of code added 14 new resources to our stack.
+That's nice. This one line of code added intricate resource configurations to our stack.
 
 ## cdktf deploy
 

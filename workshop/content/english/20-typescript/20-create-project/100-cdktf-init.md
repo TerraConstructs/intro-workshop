@@ -32,6 +32,10 @@ in the root of your project.
 ? Project Name (cdk-workshop)
 ```
 
+{{% notice danger %}}
+Workshops ran on shared AWS Accounts must use unique `Project Name` for each attendee to avoid name conflicts.
+{{% /notice %}}
+
 Confirm the prompts:
 
 - Project Name `↩`

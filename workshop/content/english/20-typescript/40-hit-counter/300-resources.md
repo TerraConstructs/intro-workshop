@@ -8,7 +8,7 @@ weight = 300
 Now, let's define the AWS Lambda function and the DynamoDB table in our
 `HitCounter` construct. Go back to `lib/hitcounter.ts` and add the following highlighted code:
 
-{{<highlight ts "hl_lines=3-4 6 16-17 22-34">}}
+{{<highlight ts "hl_lines=3-4 6 8 16-17 22-34">}}
 import { Construct } from "constructs";
 import {
   Code,

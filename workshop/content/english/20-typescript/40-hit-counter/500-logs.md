@@ -63,7 +63,7 @@ If you don't have any log groups, review the stage deployment history and/or for
 
 ## Forcing a redeployment
 
-To force a redeployment through terraform we use apply with `-replace`
+To force a redeployment through terraform we use `apply` with `-replace`
 flag ([docs](https://developer.hashicorp.com/terraform/cli/commands/plan#replace-address)),
 but first we need to know the logical address for the deployment.
 

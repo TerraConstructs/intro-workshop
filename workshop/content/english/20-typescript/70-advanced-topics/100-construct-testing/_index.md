@@ -29,8 +29,8 @@ properties are set to specific values.
 Example:
 
 ```ts
-// NOTE: terraconstructs requires to run stack.prepareStack due to
-// many of its late binding features.
+// NOTE: terraconstructs requires stack.prepareStack()
+// due to many of its late binding features.
 stack.prepareStack();
 const template = Testing.synth(stack, runValidations)
 expect(template).toHaveResourceWithProperties(instance.Instance, {
