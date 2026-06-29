@@ -9,3 +9,4 @@ new CdkWorkshopStack(app, 'CdkWorkshop', {
         region: "ap-southeast-1"
     }
 });
+app.synth();

@@ -11,6 +11,7 @@ workshop/.hugo_build.lock
 .DS_Store
 obj/
 cdk.out/
+cdktf.out/
 *~
 tsconfig.tsbuildinfo
 
