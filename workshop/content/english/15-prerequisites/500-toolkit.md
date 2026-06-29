@@ -1,9 +1,9 @@
 +++
-title = "Terraform CDK Toolkit"
+title = "CDKTN CLI Toolkit"
 weight = 500
 +++
 
-Next, we'll install the Terraform CDK Toolkit. The toolkit is a command-line utility
+Next, we'll install the CDKTN CLI Toolkit. The toolkit is a command-line utility
 which allows you to work with TerraConstructs apps.
 
 Open a terminal session and run the following command:
@@ -12,13 +12,13 @@ Open a terminal session and run the following command:
 - POSIX: on some systems you may need to run this with `sudo`
 
 ```
-npm install -g cdktf-cli
+npm install -g cdktn-cli
 ```
 
 You can check the toolkit version:
 
 ```
-$ cdktf --version
+$ cdktn --version
 {{% cdkversion %}}
 ```
 

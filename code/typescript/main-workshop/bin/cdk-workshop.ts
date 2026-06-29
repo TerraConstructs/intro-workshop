@@ -1,4 +1,4 @@
-import { App } from 'cdktf';
+import { App } from 'cdktn';
 import { CdkWorkshopStack } from '../lib/cdk-workshop-stack';
 
 const app = new App();
@@ -9,3 +9,4 @@ new CdkWorkshopStack(app, 'CdkWorkshop', {
         region: "ap-southeast-1"
     }
 });
+app.synth();

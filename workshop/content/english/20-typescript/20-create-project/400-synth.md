@@ -1,24 +1,24 @@
 +++
-title = "CDKTF synth"
+title = "CDKTN synth"
 weight = 400
 +++
 
 ## Synthesize configuration from your app
 
-CDKTF apps are effectively only a __definition__ of your infrastructure using
-code. When CDKTF apps are executed, they produce (or "__synthesize__", in CDK
+CDKTN apps are effectively only a __definition__ of your infrastructure using
+code. When CDKTN apps are executed, they produce (or "__synthesize__", in CDK
 parlance) a Terraform configuration for each stack defined in your
 application.
 
-To synthesize a CDKTF app, use the `cdktf synth` command. Let's check out the
+To synthesize a CDKTN app, use the `cdktn synth` command. Let's check out the
 template synthesized from the sample app:
 
-{{% notice info %}} The **CDKTF CLI** requires you to be in the same directory
+{{% notice info %}} The **CDKTN CLI** requires you to be in the same directory
 as your `cdktf.json` file. If you have changed directories in your terminal,
 please navigate back now.{{% /notice %}}
 
 ```
-cdktf synth
+cdktn synth
 ```
 
 Will output the following Terraform configuration (under `cdktf.out/stacks/cdk-workshop`):
@@ -29,7 +29,7 @@ Will output the following Terraform configuration (under `cdktf.out/stacks/cdk-w
     "metadata": {
       "backend": "local",
       "stackName": "cdk-workshop",
-      "version": "0.21.0"
+      "version": "0.23.3"
     },
     "outputs": {
     }

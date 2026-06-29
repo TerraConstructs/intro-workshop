@@ -13,7 +13,7 @@ First, install the [terraconstructs.dev](https://terraconstructs.dev) package in
 npm install terraconstructs
 ```
 
-Now, Replace the `TerraformStack` from `cdktf` with TerraConstruct's `AwsStack`.
+Now, Replace the `TerraformStack` from `cdktn` with TerraConstruct's `AwsStack`.
 
 This requires us to provide additional metadata such as:
 
@@ -28,7 +28,7 @@ Workshops ran on shared AWS Accounts must use unique `gridUUID` to avoid name co
 {{% /notice %}}
 
 {{<highlight ts "hl_lines=1 3 5-7 14-20">}}
-import { App } from "cdktf";
+import { App } from "cdktn";
 import { Construct } from "constructs";
 import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
 
@@ -60,7 +60,7 @@ We are now ready to use following powerful features from the TerraConstructs `aw
 - Subscribe the queue to receive any messages published to the topic (`topic.addSubscription`)
 
 {{<highlight ts "hl_lines=3 5 11-17">}}
-import { App } from "cdktf";
+import { App } from "cdktn";
 import { Construct } from "constructs";
 import { Duration } from "terraconstructs/lib";
 import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";

@@ -12,23 +12,23 @@ weight = 200
 Our `HitCounter` construct creates a simple DynamoDB table. Lets create a test that
 validates that the table is getting created.
 
-If `cdktf init` created a test directory for you, then you should have a `__tests__/main-test.ts` file. Delete this file.
+If `cdktn init` created a test directory for you, then you should have a `__tests__/main-test.ts` file. Delete this file.
 
-First, let's add `@cdktf/provider-aws` as a Dev dependency
+First, let's add `@cdktn/provider-aws` as a Dev dependency
 
 ```
-npm install -D @cdktf/provider-aws@~20.1.0
+npm install -D @cdktn/provider-aws@~24.8.0
 ```
 
 If you do not already have a `__tests__` directory (usually created automatically when you
-run `cdktf init`), then create a `__tests__` directory at the same level as `main.ts`
+run `cdktn init`), then create a `__tests__` directory at the same level as `main.ts`
 and then create a file called `hitcounter.test.ts` with the following code.
 
 ```typescript
 /* eslint-disable import/no-extraneous-dependencies */
-import { DynamodbTable as DynamodbTableL1 } from "@cdktf/provider-aws/lib/dynamodb-table";
-import { App, Testing } from "cdktf";
-import "cdktf/lib/testing/adapters/jest";
+import { DynamodbTable as DynamodbTableL1 } from "@cdktn/provider-aws/lib/dynamodb-table";
+import { App, Testing } from "cdktn";
+import "cdktn/lib/testing/adapters/jest";
 import { AwsStack } from "terraconstructs/lib/aws/aws-stack";
 import { Code, LambdaFunction, Runtime } from "terraconstructs/lib/aws/compute";
 import { HitCounter } from "../lib/hitcounter";
@@ -130,7 +130,7 @@ dummy value for now. Once we run the test it will fail and show us the expected 
 Add import for the Terraform AWS Provider `LambdaFunction` L1 resource as well (this L1 conflicts with TerraConstructs L2!):
 
 ```typescript
-import { LambdaFunction as LambdaFunctionL1 } from "@cdktf/provider-aws/lib/lambda-function";
+import { LambdaFunction as LambdaFunctionL1 } from "@cdktn/provider-aws/lib/lambda-function";
 ```
 
 Create a new test in `hitcounter.test.ts` with the below code:

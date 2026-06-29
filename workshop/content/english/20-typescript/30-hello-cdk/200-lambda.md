@@ -8,7 +8,7 @@ weight = 200
 We'll start with the Terraconstructs Lambda handler code.
 
 1. Create a directory `lambda` in the root of your project tree (next to `main.ts`).
-2. TS CDKTF projects created with `cdktf init` ignore all `.js` files by default.
+2. TS CDKTN projects created with `cdktn init` ignore all `.js` files by default.
    To track these files with git, add `!lambda/*.js` to your `.gitignore` file.
    This ensures that your Lambda assets are properly checked into source control.
 3. Add a file called `lambda/hello.js` with the following contents:
@@ -20,12 +20,12 @@ exports.handler = async function(event) {
   return {
     statusCode: 200,
     headers: { "Content-Type": "text/plain" },
-    body: `Hello, CDKTF! You've hit ${event.path}\n`
+    body: `Hello, CDKTN! You've hit ${event.path}\n`
   };
 };
 ```
 
-This is a simple Lambda function which returns the text *"Hello, CDKTF! You've
+This is a simple Lambda function which returns the text *"Hello, CDKTN! You've
 hit [url path]"*. The function's output also includes the HTTP status code and
 HTTP headers. These are used by API Gateway to formulate the HTTP response to
 the user.
@@ -62,7 +62,7 @@ help you with auto-complete, inline documentation and type safety.
 Add `import` statements at the beginning of `main.ts`, and a `LambdaFunction` to your stack.
 
 {{<highlight ts "hl_lines=4 10-15">}}
-import { App } from "cdktf";
+import { App } from "cdktn";
 import { Construct } from "constructs";
 import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
 import { Code, LambdaFunction, Runtime } from "terraconstructs/lib/aws/compute";
@@ -95,7 +95,7 @@ A few things to notice:
 
 - Our function uses the NodeJS (`NODEJS_22_X`) runtime
 - The handler code is loaded from the `lambda` directory which we created
-  earlier. Path is relative to where you execute `cdktf` from, which is the
+  earlier. Path is relative to where you execute `cdktn` from, which is the
   project's root directory
 - The name of the handler function is `hello.handler` ("hello" is the name of
   the file and "handler" is the exported function name)
@@ -121,10 +121,10 @@ signature:
    `this` for the first argument. Make a habit out of it.
 2. __`id`__: the second argument is the __local identity__ of the construct.
    It's an ID that has to be unique amongst construct within the same scope. The
-   CDKTF uses this identity to calculate the Terraform [Logical
+   CDKTN uses this identity to calculate the Terraform [Logical
    ID](https://developer.hashicorp.com/terraform/language/resources/syntax#resource-syntax)
    for each resource defined within this scope. *To read more about IDs in the
-   CDK, see the* [CDKTF user manual](https://developer.hashicorp.com/terraform/cdktf/concepts/constructs#scope).
+   CDK, see the* [CDKTN user manual](https://cdktn.io/docs/concepts/constructs#scope).
 3. __`props`__: the last (sometimes optional) argument is always a set of
    initialization properties. Those are specific to each construct. For example,
    the `LambdaFunction` construct accepts properties like `runtime`, `code` and
@@ -137,7 +137,7 @@ signature:
 Save your code, and let's take a quick look at the diff before we deploy:
 
 ```
-cdktf diff
+cdktn diff
 ```
 
 Output would look like this:
@@ -208,10 +208,10 @@ to propagate the location of the handler code.
 Let's deploy:
 
 ```
-cdktf deploy
+cdktn deploy
 ```
 
-You'll notice that `cdktf deploy` not only deployed your Terraform configuration, but
+You'll notice that `cdktn deploy` not only deployed your Terraform configuration, but
 also archived and uploaded the `lambda` directory from your disk to the asset bucket.
 
 ## Testing our function

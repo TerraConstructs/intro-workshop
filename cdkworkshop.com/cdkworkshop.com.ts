@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as path from 'node:path';
-import { App, LocalBackend, TerraformOutput } from 'cdktf';
+import { App, LocalBackend, TerraformOutput } from 'cdktn';
 import type { Construct } from 'constructs';
 import { Duration } from 'terraconstructs/lib';
 import { AwsStack, type AwsStackProps, edge, storage } from 'terraconstructs/lib/aws';

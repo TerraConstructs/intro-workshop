@@ -61,7 +61,7 @@ export class HitCounter extends Construct {
 Go back to `main.ts` and assign the `table` property of the table viewer:
 
 {{<highlight ts "hl_lines=37">}}import { TableViewer } from "@tcons/cdk-dynamo-table-viewer";
-import { App } from "cdktf";
+import { App } from "cdktn";
 import { Construct } from "constructs";
 import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
 import {

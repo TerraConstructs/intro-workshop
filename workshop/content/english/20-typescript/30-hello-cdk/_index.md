@@ -1,12 +1,12 @@
 +++
-title = "Hello, CDKTF!"
+title = "Hello, CDKTN!"
 bookFlatSection = true
 weight = 30
 +++
 
-# Hello, CDKTF!
+# Hello, CDKTN!
 
-In this chapter, we will finally write some CDKTF code. Instead of the SNS/SQS
+In this chapter, we will finally write some CDKTN code. Instead of the SNS/SQS
 code that we have in our app now, we'll add a Lambda function with an API
 Gateway endpoint in front of it.
 

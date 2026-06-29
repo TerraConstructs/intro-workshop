@@ -1,35 +1,40 @@
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
+import {
+  Code,
+  LambdaFunction,
+  IFunction,
+  Runtime,
+} from 'terraconstructs/lib/aws/compute';
+import { AttributeType, Table } from 'terraconstructs/lib/aws/storage';
 
 export interface HitCounterProps {
   /** the function for which we want to count url hits **/
-  downstream: lambda.IFunction;
+  downstream: IFunction;
 }
 
 export class HitCounter extends Construct {
   /** allows accessing the counter function */
-  public readonly handler: lambda.Function;
+  public readonly handler: LambdaFunction;
 
   /** the hit counter table */
-  public readonly table: dynamodb.Table;
+  public readonly table: Table;
 
   constructor(scope: Construct, id: string, props: HitCounterProps) {
     super(scope, id);
 
-    const table = new dynamodb.Table(this, 'Hits', {
-      partitionKey: { name: 'path', type: dynamodb.AttributeType.STRING }
+    const table = new Table(this, 'Hits', {
+      partitionKey: { name: 'path', type: AttributeType.STRING },
     });
     this.table = table;
 
-    this.handler = new lambda.Function(this, 'HitCounterHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+    this.handler = new LambdaFunction(this, 'HitCounterHandler', {
+      runtime: Runtime.NODEJS_22_X,
       handler: 'hitcounter.handler',
-      code: lambda.Code.fromAsset('lambda'),
+      code: Code.fromAsset('lambda'),
       environment: {
         DOWNSTREAM_FUNCTION_NAME: props.downstream.functionName,
-        HITS_TABLE_NAME: table.tableName
-      }
+        HITS_TABLE_NAME: table.tableName,
+      },
     });
 
     // grant the lambda role read/write permissions to our table

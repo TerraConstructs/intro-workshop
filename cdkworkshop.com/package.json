@@ -5,16 +5,16 @@
     "scripts": {
         "build": "tsc --build && (cd ../workshop && hugo)",
         "watch": "tsc --build -w",
-        "deploy": "npm run build && cdktf deploy",
-        "synth": "npm run build && npx cdktf synth"
+        "deploy": "npm run build && cdktn deploy",
+        "synth": "npm run build && npx cdktn synth"
     },
     "devDependencies": {
         "@biomejs/biome": "1.8.3",
         "@types/node": "^20.14.11",
-        "cdktf": "^0.21.0",
-        "cdktf-cli": "^0.21.0",
-        "constructs": "^10.4.2",
-        "terraconstructs": "^0.1.0",
+        "cdktn": "^0.23.3",
+        "cdktn-cli": "^0.23.3",
+        "constructs": "^10.6.0",
+        "terraconstructs": "^0.2.6",
         "typescript": "^5.5.3"
     },
     "repository": {
@@ -22,9 +22,9 @@
         "type": "git"
     },
     "dependencies": {
-        "cdktf": "^0.21.0",
-        "constructs": "^10.4.2",
-        "terraconstructs": "^0.1.0"
+        "cdktn": "^0.23.3",
+        "constructs": "^10.6.0",
+        "terraconstructs": "^0.2.6"
     },
     "engines": {
         "node": ">= 20.0.0"

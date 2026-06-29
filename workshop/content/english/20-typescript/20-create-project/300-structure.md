@@ -15,8 +15,8 @@ You'll see something like this:
 
 ![](./structure.png)
 
-* __`main.ts`__ is where your CDKTF application's main stack is defined.
-  This is the file we'll be spending most of our time in. this is also the entrypoint of the CDKTF application.
+* __`main.ts`__ is where your CDKTN application's main stack is defined.
+  This is the file we'll be spending most of our time in. this is also the entrypoint of the CDKTN application.
 * `package.json` is your npm module manifest. It includes information like the
   name of your app, version, dependencies and build scripts like "watch" and
   "build" (`package-lock.json` is maintained by npm)
@@ -35,7 +35,7 @@ Let's have a quick look at `main.ts`:
 
 ```ts
 import { Construct } from "constructs";
-import { App, TerraformStack } from "cdktf";
+import { App, TerraformStack } from "cdktn";
 
 class MyStack extends TerraformStack {
   constructor(scope: Construct, id: string) {

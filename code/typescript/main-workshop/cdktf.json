@@ -1,0 +1,9 @@
+{
+  "language": "typescript",
+  "app": "npx ts-node --prefer-ts-exts bin/cdk-workshop.ts",
+  "projectId": "94c711d1-2fba-46c8-84d7-67a1c00ea584",
+  "sendCrashReports": "false",
+  "terraformProviders": [],
+  "terraformModules": [],
+  "context": {}
+}

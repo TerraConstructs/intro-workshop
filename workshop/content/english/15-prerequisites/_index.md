@@ -23,6 +23,6 @@ Click on the arrow to the right to continue to the first step.
 
 ## See Also
 
-- [Prerequisites in the Terraform CDK User Guide](https://developer.hashicorp.com/terraform/tutorials/cdktf/cdktf-build#prerequisites)
+- [Prerequisites in the CDKTN User Guide](https://cdktn.io/docs)
 
 {{< nextprevlinks >}}

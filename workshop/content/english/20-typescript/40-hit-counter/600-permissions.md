@@ -56,7 +56,7 @@ export class HitCounter extends Construct {
 Save & deploy:
 
 ```
-cdktf deploy
+cdktn deploy
 ```
 
 ## Test again
@@ -173,10 +173,10 @@ export class HitCounter extends Construct {
 
 ## Diff
 
-You can check what this did using `cdktf diff`:
+You can check what this did using `cdktn diff`:
 
 ```
-cdktf diff
+cdktn diff
 ```
 
 The **aws_iam_role_policy** section should look something like this,
@@ -235,7 +235,7 @@ Which is exactly what we wanted.
 Okay... let's give this another shot:
 
 ```
-cdktf deploy
+cdktn deploy
 ```
 
 Then hit your endpoint with `curl` or with your web browser:
