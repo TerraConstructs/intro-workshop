@@ -24,6 +24,6 @@
     "cdktn": "0.23.3",
     "terraconstructs": "^0.2.6",
     "constructs": "^10.6.0",
-    "@tcons/cdk-dynamo-table-viewer": "^0.0.1"
+    "@tcons/cdk-dynamo-table-viewer": "^0.0.2"
   }
 }
