@@ -4,7 +4,7 @@ weight = 550
 +++
 
 Next, we'll install the Terraform CLI. Terraform is a command-line utility
-which allows you to apply the Terraform CDK generated configurations.
+which allows you to apply the CDKTN generated configurations.
 
 {{% notice info %}} You may use [tenv](https://github.com/tofuutils/tenv?tab=readme-ov-file#installation) to manage multiple versions of `terraform` or [OpenTofu](https://opentofu.org/).
 Follow the installation instructions for your operating system.{{% /notice %}}
@@ -22,7 +22,7 @@ $ terraform --version
 1.7.3
 ```
 
-{{% notice info %}} When using `tenv`, best practice to set `TERRAFORM_BINARY_NAME` environment variable for CDKTF CLI.{{% /notice %}}
+{{% notice info %}} When using `tenv`, best practice to set `TERRAFORM_BINARY_NAME` environment variable for CDKTN CLI.{{% /notice %}}
 
 ```
 export TERRAFORM_BINARY_NAME=$(which terraform)

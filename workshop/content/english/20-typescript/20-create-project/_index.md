@@ -6,9 +6,9 @@ weight = 20
 
 # Creating your first CDK project
 
-In this chapter we will use `cdktf init` to create a new CDKTF TypeScript project.
+In this chapter we will use `cdktn init` to create a new CDKTN TypeScript project.
 
-We will also learn how to use the CDKTF Toolkit to synthesize a Terraform configuration,
+We will also learn how to use the CDKTN Toolkit to synthesize a Terraform configuration,
 install TerraConstructs for a demo app and how to deploy your app into your account.
 
 {{< nextprevlinks >}}

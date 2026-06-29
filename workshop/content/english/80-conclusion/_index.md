@@ -10,10 +10,10 @@ You've successfully finished our __Introduction to TerraConstructs on AWS worksh
 
 In this workshop, you've learned how to:
 
-- Create a new CDKTF project in TypeScript using `cdktf init`
-- Augment CDKTF with TerraConstructs
+- Create a new CDKTN project in TypeScript using `cdktn init`
+- Augment CDKTN with TerraConstructs
 - Add resources to your CDK application stack
-- Use `cdktf diff` and `cdktf deploy` to deploy your app to an AWS environment
+- Use `cdktn diff` and `cdktn deploy` to deploy your app to an AWS environment
 - Author and use your own custom construct (`HitCounter`)
 - Consume a construct from another npm module (`cdk-dynamo-table-viewer`)
 - Use the AWS Lambda, API Gateway and DynamoDB AWS TerraConstructs

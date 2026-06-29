@@ -1,4 +1,4 @@
-import { App } from 'cdktf';
+import { App } from 'cdktn';
 import { CdkWorkshopStack } from '../lib/cdk-workshop-stack';
 
 const app = new App();

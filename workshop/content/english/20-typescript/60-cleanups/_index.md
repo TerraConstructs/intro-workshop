@@ -76,7 +76,7 @@ export class HitCounter extends Construct {
 Since we made a change in the construct file, we need to redeploy the stack to put the changes into effect. Use `cdk deploy`:
 
 ```
-cdktf deploy
+cdktn deploy
 ```
 
 Additionally, the Lambda function created will generate CloudWatch logs that are
@@ -89,10 +89,10 @@ delete these in the console if desired.
 
 Now that we know which resources will be deleted, we can proceed with deleting the
 stack. You can either delete the stack through the AWS CloudFormation console or use
-`cdktf destroy`:
+`cdktn destroy`:
 
 ```
-cdktf destroy
+cdktn destroy
 ```
 
 You'll be asked:

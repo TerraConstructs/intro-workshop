@@ -20,7 +20,7 @@ Going back to `main.ts`, let's define an API endpoint and associate it with our 
 <!-- Terraconstructs BUG: CW Logs integration to AWS Account causes flip-flop -->
 
 {{<highlight ts "hl_lines=8 16 23-27">}}
-import { App } from "cdktf";
+import { App } from "cdktn";
 import { Construct } from "constructs";
 import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
 import {
@@ -64,12 +64,12 @@ app.synth();
 That's it. This is all you need to do in order to define an API Gateway which
 proxies all requests to an AWS Lambda function.
 
-## cdktf diff
+## cdktn diff
 
 Let's see what's going to happen when we deploy this:
 
 ```
-cdktf diff
+cdktn diff
 ```
 
 Output should look like this:
@@ -120,12 +120,12 @@ cdk-workshop  Changes to Outputs:
 
 That's nice. This one line of code added intricate resource configurations to our stack.
 
-## cdktf deploy
+## cdktn deploy
 
 Okay, ready to deploy?
 
 ```
-cdktf deploy --skip-synth
+cdktn deploy --skip-synth
 ```
 
 ## Stack outputs
@@ -162,7 +162,7 @@ curl https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/prod/
 Output should look like this:
 
 ```
-Hello, CDKTF! You've hit /
+Hello, CDKTN! You've hit /
 ```
 
 You can also use your web browser for this:

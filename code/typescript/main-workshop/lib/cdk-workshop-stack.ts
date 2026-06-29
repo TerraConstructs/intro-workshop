@@ -1,4 +1,4 @@
-import type { App } from 'cdktf';
+import type { App } from 'cdktn';
 import * as aws from 'terraconstructs/lib/aws';
 import * as compute from 'terraconstructs/lib/aws/compute';
 import { HitCounter } from './hitcounter';

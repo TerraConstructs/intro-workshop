@@ -1,5 +1,5 @@
 +++
-title = "CDKTF deploy"
+title = "CDKTN deploy"
 weight = 500
 +++
 
@@ -7,10 +7,10 @@ Okay, we've got a Terraform configuration. What's next? __Let's deploy it into o
 
 ## Let's deploy
 
-Use `cdktf deploy` to deploy a CDKTF app:
+Use `cdktn deploy` to deploy a CDKTN app:
 
 ```
-cdktf deploy
+cdktn deploy
 ```
 
 The Terraform configuration is first used to initialize `terraform`.
@@ -71,8 +71,8 @@ No outputs found.
 
 ## The Terraform CLI
 
-Under the hood CDKTF apps are still simply deployed through the `terraform` CLI.
-Each CDKTF stack maps 1:1 with a terraform folder under `cdktf.out/stacks/`.
+Under the hood CDKTN apps are still simply deployed through the `terraform` CLI.
+Each CDKTN stack maps 1:1 with a terraform folder under `cdktf.out/stacks/`.
 
 This means that you can also use the `terraform` CLI in order to manage
 your stacks.

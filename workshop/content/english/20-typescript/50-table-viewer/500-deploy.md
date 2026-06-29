@@ -3,13 +3,13 @@ title = "Deploying our app"
 weight = 500
 +++
 
-## cdktf diff
+## cdktn diff
 
 Before we deploy, let's take a look at what will happen when we deploy our app
 (this is just the `Resources` section of the output):
 
 ```
-$ cdktf diff
+$ cdktn diff
 cdk-workshop  Terraform used the selected providers to generate the following execution
               plan. Resource actions are indicated with the following symbols:
 cdk-workshop  + create
@@ -117,10 +117,10 @@ responsibility to understand how certain constructs that you use impact your
 application, and to make sure you only use construct libraries from vendors you
 trust  {{% /notice %}}
 
-### cdktf deploy
+### cdktn deploy
 
 ```
-$ cdktf deploy --skip-synth
+$ cdktn deploy --skip-synth
 ...
 
 cdk-workshop  EndpointOutputs = {

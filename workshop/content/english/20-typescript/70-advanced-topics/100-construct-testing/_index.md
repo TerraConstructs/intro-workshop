@@ -7,13 +7,13 @@ bookCollapseSection = true
 
 ## Testing Constructs (Optional)
 
-The [CDK for Terraform Developer Guide](https://developer.hashicorp.com/terraform/cdktf/test/unit-tests) has a good guide on testing constructs.
+The [CDKTN Developer Guide](https://cdktn.io/docs/test/unit-tests) has a good guide on testing constructs.
 
 <!-- For this section of the workshop we are going to use the [Fine-Grained Assertions](https://docs.aws.amazon.com/cdk/latest/guide/testing.html#testing_fine_grained) and [Validation](https://docs.aws.amazon.com/cdk/latest/guide/testing.html#testing_validation) type tests. -->
 
-#### CDKTF assert Library
+#### CDKTN assert Library
 
-We will be using the CDKTF Jest Matchers throughout this section.
+We will be using the CDKTN Jest Matchers throughout this section.
 The library contains several helper functions for writing unit and integration tests.
 
 {{% notice info %}}
@@ -43,6 +43,6 @@ expect(template).not.toHaveResourceWithProperties(instance.Instance, {
 });
 ```
 
-To see the rest of the documentation, please read the docs [here](https://developer.hashicorp.com/terraform/cdktf/test/unit-tests#write-assertions).
+To see the rest of the documentation, please read the docs [here](https://cdktn.io/docs/test/unit-tests#write-assertions).
 
 {{< nextprevlinks >}}

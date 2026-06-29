@@ -12,7 +12,7 @@ so remove them from the `MyStack` constructor.
 Open `main.ts` and clean it up. Eventually it should look like this:
 
 ```ts
-import { App } from "cdktf";
+import { App } from "cdktn";
 import { Construct } from "constructs";
 import { AwsStack, AwsStackProps } from "terraconstructs/lib/aws";
 
@@ -36,13 +36,13 @@ app.synth();
 
 ```
 
-## cdktf diff
+## cdktn diff
 
-Now that we modified our stack's contents, we can ask the toolkit to show us the difference between our CDKTF app and
-what's currently deployed. This is a safe way to check what will happen once we run `cdktf deploy` and is always good practice:
+Now that we modified our stack's contents, we can ask the toolkit to show us the difference between our CDKTN app and
+what's currently deployed. This is a safe way to check what will happen once we run `cdktn deploy` and is always good practice:
 
 ```
-cdktf diff
+cdktn diff
 ```
 
 Output should look like the following:
@@ -107,12 +107,12 @@ cdk-workshop    # aws_sns_topic.CdkWorkshopTopic_D368A42F will be destroyed
 
 As expected, all of our resources are going to be brutally destroyed.
 
-## cdktf deploy
+## cdktn deploy
 
-Run `cdktf deploy` and wait for a final `Approve`, then __proceed to the next section__
+Run `cdktn deploy` and wait for a final `Approve`, then __proceed to the next section__
 
 ```
-cdktf deploy
+cdktn deploy
 ```
 
 You should see the resources being deleted.
