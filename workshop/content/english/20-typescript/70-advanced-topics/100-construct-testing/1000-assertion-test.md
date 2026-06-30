@@ -56,7 +56,7 @@ describe("HitCounter", () => {
     // WHEN
     new HitCounter(stack, "MyTestConstruct", {
       downstream: new LambdaFunction(stack, "TestFunction", {
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_24_X,
         handler: "hello.handler",
         code: Code.fromAsset("lambda"),
       }),
@@ -113,7 +113,7 @@ environment variable values were references to other constructs.
 
 {{<highlight ts "hl_lines=6-7">}}
 this.handler = new lambda.Function(this, 'HitCounterHandler', {
-  runtime: lambda.Runtime.NODEJS_20_X,
+  runtime: lambda.Runtime.NODEJS_24_X,
   handler: 'hitcounter.handler',
   code: lambda.Code.fromAsset('lambda'),
   environment: {
@@ -140,7 +140,7 @@ Create a new test in `hitcounter.test.ts` with the below code:
     // WHEN
     new HitCounter(stack, 'MyTestConstruct', {
       downstream:  new LambdaFunction(stack, 'TestFunction', {
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_24_X,
         handler: 'hello.handler',
         code: Code.fromAsset('lambda')
       })
@@ -224,7 +224,7 @@ Grab the real values for the environment variables and update your test
     // WHEN
     new HitCounter(stack, 'MyTestConstruct', {
       downstream:  new LambdaFunction(stack, 'TestFunction', {
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_24_X,
         handler: 'hello.handler',
         code: Code.fromAsset('lambda')
       })
@@ -280,7 +280,7 @@ First we'll update the test to reflect this new requirement.
     // WHEN
     new HitCounter(stack, "MyTestConstruct", {
       downstream: new LambdaFunction(stack, "TestFunction", {
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_24_X,
         handler: "hello.handler",
         code: Code.fromAsset("lambda"),
       }),
@@ -381,7 +381,7 @@ export class HitCounter extends Construct {
     });
 
     this.handler = new LambdaFunction(this, "HitCounterHandler", {
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: "hitcounter.handler",
       code: Code.fromAsset("lambda"),
       environment: {

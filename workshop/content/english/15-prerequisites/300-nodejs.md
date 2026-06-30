@@ -5,7 +5,7 @@ weight = 300
 +++
 
 CDKTN uses Node.js (>= 20.9.0).
-A version in active long-term support (22.x at this writing) is recommended.
+A version in active long-term support (24.x at this writing) is recommended.
 
 * To install Node.js visit the [node.js](https://nodejs.org) website.
 
@@ -18,10 +18,10 @@ A version in active long-term support (22.x at this writing) is recommended.
     node --version
     ```
 
-    Output should be >= 18:
+    Output should be >= 20:
 
     ```
-    v20.19.3
+    v24.4.1
     ```
 
 {{< nextprevlinks >}}

@@ -112,9 +112,9 @@ url = "https://stackoverflow.com/questions/tagged/terraconstructs"
 weight = 3
 
 [[menu.after]]
-name = "CDK on Discord"
+name = "CDK.dev Slack"
 identifier = "gt"
-url = "https://discord.gg/w2NNph9q9W"
+url = "https://cdk.dev"
 weight = 4
 
 [[menu.after]]
