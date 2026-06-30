@@ -8,7 +8,7 @@ test('DynamoDB Table Created', () => {
 
   new HitCounter(stack, 'MyTestConstruct', {
     downstream: new lambda.Function(stack, 'TestFunction', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'hello.handler',
       code: lambda.Code.fromAsset('lambda')
     })
@@ -24,7 +24,7 @@ test('Lambda Has Environment Variables', () => {
 
   new HitCounter(stack, 'MyTestConstruct', {
     downstream: new lambda.Function(stack, 'TestFunction', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'hello.handler',
       code: lambda.Code.fromAsset('lambda')
     })
@@ -55,7 +55,7 @@ test('DynamoDB Table Created With Encryption', () => {
 
   new HitCounter(stack, 'MyTestConstruct', {
     downstream: new lambda.Function(stack, 'TestFunction', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'hello.handler',
       code: lambda.Code.fromAsset('lambda')
     })
@@ -75,7 +75,7 @@ test('Read Capacity can be configured', () => {
   expect(() => {
     new HitCounter(stack, 'MyTestConstruct', {
       downstream: new lambda.Function(stack, 'TestFunction', {
-        runtime: lambda.Runtime.NODEJS_14_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         handler: 'hello.handler',
         code: lambda.Code.fromAsset('lambda')
       }),
