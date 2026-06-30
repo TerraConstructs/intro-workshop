@@ -73,7 +73,7 @@ class MyStack extends AwsStack {
 
     // defines an AWS Lambda resource
     new LambdaFunction(this, "HelloHandler", {
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       code: Code.fromAsset("lambda"),
       handler: "hello.handler",
     });
@@ -93,7 +93,7 @@ app.synth();
 
 A few things to notice:
 
-- Our function uses the NodeJS (`NODEJS_22_X`) runtime
+- Our function uses the NodeJS (`NODEJS_24_X`) runtime
 - The handler code is loaded from the `lambda` directory which we created
   earlier. Path is relative to where you execute `cdktn` from, which is the
   project's root directory

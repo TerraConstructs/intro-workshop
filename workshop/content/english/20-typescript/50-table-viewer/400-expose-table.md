@@ -38,7 +38,7 @@ export class HitCounter extends Construct {
     this.table = table;
 
     this.handler = new LambdaFunction(this, "HitCounterHandler", {
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: "hitcounter.handler",
       code: Code.fromAsset("lambda"),
       environment: {
@@ -78,7 +78,7 @@ class MyStack extends AwsStack {
 
     // defines an AWS Lambda resource
     const hello = new LambdaFunction(this, "HelloHandler", {
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       code: Code.fromAsset("lambda"),
       handler: "hello.handler",
     });

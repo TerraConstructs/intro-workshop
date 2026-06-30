@@ -23,6 +23,6 @@ Click on the arrow to the right to continue to the first step.
 
 ## See Also
 
-- [Prerequisites in the CDKTN User Guide](https://cdktn.io/docs)
+- [Install CDKTN tutorial in the CDKTN User Guide](https://cdktn.io/docs/tutorials/install)
 
 {{< nextprevlinks >}}
