@@ -9,7 +9,7 @@ test('DynamoDB Table Created', () => {
   new HitCounter(stack, 'MyTestConstruct', {
     hitcounterPath: 'lambda',
     downstream: new lambda.Function(stack, 'TestFunction', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`exports.handler = async function(event) {
           console.log("event: ", event);
