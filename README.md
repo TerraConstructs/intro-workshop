@@ -1,3 +1,18 @@
+> [!IMPORTANT]
+> **This repository is archived and the workshop has moved.**
+>
+> The workshop now lives at **<https://terraconstructs.dev/workshops/aws>**, ported from Hugo
+> to MDX and served as part of the main TerraConstructs website. Edit it there — content
+> changes made here will not be published.
+>
+> `aws-workshop.terraconstructs.dev` no longer exists as its own site. Its CloudFront
+> distribution, S3 bucket and certificate were destroyed on 2026-07-26; the subdomain is now
+> an alias on the main distribution that 301s every old URL to its new location, so existing
+> links keep working. The Terraform state under `cdkworkshop.com/` is retained as the record
+> of what was torn down.
+>
+> Still useful here: the `code/` sample projects the workshop walks through, and `diagrams/`.
+
 ## Introduction to TerraConstructs - Workshop
 
 This workshop is a fork of the
